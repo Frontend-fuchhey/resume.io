@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+ï»¿import { useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   X,
@@ -9,15 +9,16 @@ import {
   Instagram,
   Mail,
   ExternalLink,
-  Sparkles,
   Code2,
   Shield,
+  Sparkles,
 } from 'lucide-react'
+import shrawanImg from '../../assets/shrawan.jpg'
 
 const SOCIALS = [
   { label: 'GitHub', icon: Github, href: 'https://github.com/shrawankarki', color: '#1A1A1A' },
   { label: 'LinkedIn', icon: Linkedin, href: 'https://linkedin.com/in/shrawankarki', color: '#0A66C2' },
-  { label: 'Twitter / X', icon: Twitter, href: 'https://twitter.com/shrawankarki', color: '#000000' },
+  { label: 'Twitter', icon: Twitter, href: 'https://twitter.com/shrawankarki', color: '#1DA1F2' },
   { label: 'Facebook', icon: Facebook, href: 'https://facebook.com/shrawankarki', color: '#1877F2' },
   { label: 'Instagram', icon: Instagram, href: 'https://instagram.com/shrawankarki', color: '#E1306C' },
   { label: 'Email', icon: Mail, href: 'mailto:hello@shrawankarki.com.np', color: '#FF5E1A' },
@@ -86,8 +87,6 @@ export function AboutCreatorModal({ open, onClose }) {
             className="relative w-full max-w-[480px] overflow-hidden rounded-[18px] bg-white shadow-[0_32px_80px_rgba(26,26,26,0.18)] border border-[#E8E4DC]"
             style={{ fontFamily: "'Poppins', sans-serif" }}
           >
-            <div className="h-1 w-full" style={{ background: 'linear-gradient(90deg,#FF5E1A 0%,#FF8C5A 100%)' }} />
-
             <button
               type="button"
               onClick={onClose}
@@ -100,19 +99,17 @@ export function AboutCreatorModal({ open, onClose }) {
             <div className="max-h-[80vh] overflow-y-auto px-7 pb-7 pt-6">
 
               <div className="flex items-center gap-4 mb-5">
-                <div
-                  className="flex h-[56px] w-[56px] shrink-0 items-center justify-center rounded-2xl text-white text-xl font-bold shadow-md"
-                  style={{ background: 'linear-gradient(135deg,#FF5E1A 0%,#FF8C5A 100%)' }}
-                >
-                  SK
+                <div className="shrink-0 h-[56px] w-[56px] rounded-2xl overflow-hidden shadow-md border border-[#E8E4DC]">
+                  <img
+                    src={shrawanImg}
+                    alt="Shrawan Karki"
+                    className="h-full w-full object-cover object-center"
+                    draggable={false}
+                  />
                 </div>
                 <div>
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-[#FFD9C9] bg-[#FFF3EB] px-2.5 py-0.5 text-[11px] font-semibold text-[#FF5E1A] mb-1">
-                    <Sparkles size={11} />
-                    Solo Creator & Developer
-                  </span>
                   <p className="text-[11px] text-[#9E988E] font-medium">
-                    resume.io — ATS Resume Studio
+                    resume.io - ATS Resume Studio
                   </p>
                 </div>
               </div>
@@ -126,7 +123,7 @@ export function AboutCreatorModal({ open, onClose }) {
               </h2>
 
               <p className="text-[13px] font-medium text-[#666055] mb-4">
-                Developer, Security Enthusiast & Tech Creator
+                Developer, Security Enthusiast &amp; Tech Creator
               </p>
 
               <div className="flex flex-wrap gap-2 mb-5">
@@ -147,12 +144,12 @@ export function AboutCreatorModal({ open, onClose }) {
                 <p className="text-[13px] leading-relaxed text-[#4A4640]">
                   <strong className="font-semibold text-[#1A1A1A]">Shrawan Karki</strong> is the
                   sole creator and developer behind this{' '}
-                  <span className="font-semibold text-[#FF5E1A]">ATS Resume Builder</span> — built
+                  <span className="font-semibold text-[#FF5E1A]">ATS Resume Builder</span> - built
                   to eliminate the layout friction that causes resumes to fail automated screeners.
                 </p>
                 <p className="mt-2.5 text-[13px] leading-relaxed text-[#4A4640]">
                   This studio delivers a clean single-column structure, real-time 3-pane canvas
-                  editing, strict vector-text PDF export, and a human-centered setup wizard — all
+                  editing, strict vector-text PDF export, and a human-centered setup wizard - all
                   powered by the philosophy that{' '}
                   <em className="italic text-[#1A1A1A]">great tooling should feel invisible.</em>
                 </p>
@@ -196,7 +193,7 @@ export function AboutCreatorModal({ open, onClose }) {
               </div>
 
               <p className="mt-5 text-center text-[10px] text-[#B8B2A9]">
-                Built with ? in Nepal · resume.io v1.0
+                Built with love in Nepal Â· resume.io v1.0
               </p>
             </div>
           </motion.div>
