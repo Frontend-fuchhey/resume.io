@@ -97,6 +97,14 @@ export function PreviewPane() {
   const shapeClass = SHAPE_MAP[formatting.canvasShape || 'sharp']
   const outlineClass = OUTLINE_MAP[formatting.canvasOutline || 'none']
 
+  const pageCount = Math.max(1, Math.ceil(naturalH / pageMinHeight))
+  const pageBreaks = []
+  if (overflows) {
+    for (let p = 1; p < pageCount; p++) {
+      pageBreaks.push(p * pageMinHeight)
+    }
+  }
+
   return (
     <div className="relative flex h-full min-w-0 flex-col bg-[#FBF9F5]">
       {/* Floating Canvas Toolbar anchored at the top center */}
@@ -114,8 +122,12 @@ export function PreviewPane() {
         className="studio-grid relative min-h-0 flex-1 overflow-auto p-8 pt-16"
       >
         {overflows && (
-          <div className="sticky top-2 z-10 mx-auto mb-3 w-fit rounded-full border border-amber-300 bg-amber-50 px-3.5 py-1 text-[11px] font-medium text-amber-800 shadow-sm">
-            Note: Content spans more than 1 page. Adjust margins or spacing to keep single page ATS.
+          <div className="sticky top-2 z-10 mx-auto mb-3 flex items-center gap-2 rounded-full border border-amber-300 bg-amber-50/95 px-3.5 py-1 text-[11px] font-medium text-amber-800 shadow-sm backdrop-blur-xs">
+            <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
+            <span>
+              Content spans <strong>{pageCount} pages</strong> ({isLetter ? 'US Letter' : 'A4 Standard'}).
+              Use <em>Compact</em> margin density or adjust spacing to keep single-page ATS.
+            </span>
           </div>
         )}
 
@@ -142,6 +154,21 @@ export function PreviewPane() {
                   minHeight: pageMinHeight,
                 }}
               >
+                {/* Page Break Boundaries Visualizer */}
+                {pageBreaks.map((breakY, idx) => (
+                  <div
+                    key={idx}
+                    className="pointer-events-none absolute left-0 right-0 z-30 flex items-center select-none"
+                    style={{ top: breakY }}
+                  >
+                    <div className="h-0 flex-1 border-b-2 border-dashed border-rose-400/80" />
+                    <span className="mx-2 shrink-0 rounded-full border border-rose-300 bg-rose-50/95 px-2.5 py-0.5 text-[9px] font-bold tracking-wider text-rose-700 shadow-sm uppercase backdrop-blur-xs">
+                      Page Break · Page {idx + 2} Starts Here
+                    </span>
+                    <div className="h-0 w-8 border-b-2 border-dashed border-rose-400/80" />
+                  </div>
+                ))}
+
                 <Template resume={resume} />
               </div>
             </div>

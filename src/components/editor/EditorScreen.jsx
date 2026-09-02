@@ -10,6 +10,7 @@ import { toast } from '../../store/useUIStore'
 import { exportResumePdf } from '../../pdf/exportPdf'
 import { resumeFilename } from '../../lib/names'
 import { AboutCreatorModal } from '../AboutCreatorModal'
+import { AtsScoreBadge } from './ats'
 
 export function EditorScreen({ onHome }) {
   const resume = useResumeStore()
@@ -68,17 +69,23 @@ export function EditorScreen({ onHome }) {
               </div>
             </div>
           </div>
-          {/* ── About Creator button ── */}
-          <button
-            type="button"
-            onClick={() => setAboutOpen(true)}
-            title="About Creator"
-            aria-label="About Creator"
-            className="group flex items-center gap-1.5 rounded-lg border border-[#E5E2DC] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#666055] transition-all hover:border-[#FF5E1A] hover:text-[#FF5E1A] hover:bg-[#FFF3EB]"
-          >
-            <UserCircle2 size={14} className="shrink-0 transition-colors group-hover:text-[#FF5E1A]" />
-            <span className="hidden sm:inline">About</span>
-          </button>
+
+          <div className="flex items-center gap-2">
+            {/* Live ATS Score Badge */}
+            <AtsScoreBadge />
+
+            {/* ── About Creator button ── */}
+            <button
+              type="button"
+              onClick={() => setAboutOpen(true)}
+              title="About Creator"
+              aria-label="About Creator"
+              className="group flex items-center gap-1.5 rounded-lg border border-[#E5E2DC] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#666055] transition-all hover:border-[#FF5E1A] hover:text-[#FF5E1A] hover:bg-[#FFF3EB]"
+            >
+              <UserCircle2 size={14} className="shrink-0 transition-colors group-hover:text-[#FF5E1A]" />
+              <span className="hidden sm:inline">About</span>
+            </button>
+          </div>
         </div>
 
         {/* Tab Switcher at the Top: Create | Templates */}

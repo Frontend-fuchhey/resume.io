@@ -10,6 +10,7 @@ export function freshBasic() {
     phone: '',
     location: '',
     avatar: '',
+    hidePhotoForAts: false,
     linkedin: '',
     portfolio: '',
     summary: '',
@@ -46,7 +47,7 @@ export function freshCertification() {
 
 export function freshFormatting() {
   return {
-    fontFamily: 'Poppins', // 'Poppins' | 'Courgette'
+    fontFamily: 'Poppins', // 'Poppins' | 'Inter' | 'Roboto' | 'Lato' | 'Garamond' | 'Courgette'
     fontWeight: '400',
     fontSize: 10.5,
     accentColor: '#244CEC', // Default accent swatch as requested
@@ -58,7 +59,12 @@ export function freshFormatting() {
     canvasShape: 'sharp', // 'sharp' | 'rounded' | 'smooth'
     canvasShadow: 'subtle', // 'none' | 'subtle' | 'medium' | 'deep'
     canvasOutline: 'none', // 'none' | 'hairline' | 'accent'
+    marginDensity: 'standard', // 'compact' | 'standard' | 'spacious'
   }
+}
+
+export function defaultSectionOrder() {
+  return ['summary', 'experience', 'education', 'websites', 'skills', 'hobbies']
 }
 
 export function blankVisibility() {
@@ -85,6 +91,7 @@ export function blankResume() {
     projects: [],
     certifications: [],
     visibility: blankVisibility(),
+    sectionOrder: defaultSectionOrder(),
     templateId: 'ats-studio',
     formatting: freshFormatting(),
   }

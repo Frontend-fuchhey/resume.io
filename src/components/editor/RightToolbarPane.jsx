@@ -1,4 +1,4 @@
-﻿import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   AlignCenter,
   AlignJustify,
@@ -7,7 +7,9 @@ import {
   Check,
   ChevronDown,
   Download,
+  FileJson,
   Share2,
+  Upload,
 } from "lucide-react";
 import { useResumeStore } from "../../store/useResumeStore";
 import { toast } from "../../store/useUIStore";
@@ -16,6 +18,9 @@ import { STUDIO_PALETTE } from "../../../skills/ui-ux-pro-max";
 export function RightToolbarPane({ onDownload, isDownloading }) {
   const formatting = useResumeStore((s) => s.formatting || {});
   const setFormatting = useResumeStore((s) => s.setFormatting);
+  const importResume = useResumeStore((s) => s.importResume);
+  const fileImportRef = useRef(null);
+  const [jsonMenuOpen, setJsonMenuOpen] = useState(false);
 
   // Style accordion expansion states
   const [openDimensions, setOpenDimensions] = useState(true);
@@ -32,6 +37,64 @@ export function RightToolbarPane({ onDownload, isDownloading }) {
     }
   };
 
+  const handleBackupJson = () => {
+    const state = useResumeStore.getState();
+    const payload = {
+      basic: state.basic,
+      experience: state.experience,
+      education: state.education,
+      websites: state.websites,
+      skillGroups: state.skillGroups,
+      hobbies: state.hobbies,
+      projects: state.projects,
+      certifications: state.certifications,
+      visibility: state.visibility,
+      sectionOrder: state.sectionOrder,
+      templateId: state.templateId,
+      formatting: state.formatting,
+      exportedAt: new Date().toISOString(),
+      version: "1.0",
+    };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {
+      type: "application/json",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    const name = (state.basic?.fullName || "resume")
+      .toLowerCase()
+      .replace(/\s+/g, "-");
+    a.download = `${name}-backup.json`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast("Resume JSON backup downloaded!");
+    setJsonMenuOpen(false);
+  };
+
+  const handleImportFile = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const data = JSON.parse(event.target.result);
+        if (!data.basic && !data.experience && !data.education) {
+          throw new Error("Invalid resume JSON format");
+        }
+        importResume(data);
+        toast("Resume imported from JSON successfully!");
+      } catch (err) {
+        console.error(err);
+        toast("Failed to parse JSON file. Please verify format.", "error");
+      }
+    };
+    reader.readAsText(file);
+    e.target.value = "";
+    setJsonMenuOpen(false);
+  };
+
   const activeFontFamily = formatting.fontFamily || "Poppins";
   const activeFontWeight = formatting.fontWeight || "400";
   const activeFontSize = formatting.fontSize || 10.5;
@@ -41,6 +104,7 @@ export function RightToolbarPane({ onDownload, isDownloading }) {
   const activeLineHeight = formatting.lineHeight || 140;
   const activeLetterSpacing = formatting.letterSpacing ?? 0;
   const activeDimensions = formatting.canvasDimensions || "A4";
+  const activeMarginDensity = formatting.marginDensity || "standard";
   const activeShape = formatting.canvasShape || "sharp";
   const activeShadow = formatting.canvasShadow || "subtle";
   const activeOutline = formatting.canvasOutline || "none";
@@ -49,10 +113,61 @@ export function RightToolbarPane({ onDownload, isDownloading }) {
     <div className="flex h-full flex-col bg-[#FBF9F5] border-l border-[#E8E4DC]">
       {/* Top Header Bar */}
       <div className="flex shrink-0 items-center justify-between border-b border-[#E8E4DC] bg-white px-3.5 py-2.5">
-        {/* Saved Badge */}
-        <div className="flex items-center gap-1.5 rounded-full border border-[#D1EED5] bg-[#EBF7EE] px-2 py-0.5 text-[11px] font-medium text-[#1E7E34]">
-          <Check size={12} strokeWidth={2.6} />
-          <span>Saved</span>
+        {/* Saved Badge & JSON Backup/Import Action */}
+        <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1 rounded-full border border-[#D1EED5] bg-[#EBF7EE] px-2 py-0.5 text-[11px] font-medium text-[#1E7E34]">
+            <Check size={12} strokeWidth={2.6} />
+            <span>Saved</span>
+          </div>
+
+          {/* Dropdown Menu for Backup JSON & Import JSON */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setJsonMenuOpen(!jsonMenuOpen)}
+              className="flex items-center gap-1 rounded-md border border-[#E8E4DC] bg-[#FBF9F5] px-2 py-0.5 text-[11px] font-medium text-[#666055] hover:border-[#FF5E1A]/40 hover:bg-[#FFF3EB] hover:text-[#FF5E1A] transition-colors"
+              title="Backup or restore resume JSON data"
+            >
+              <FileJson size={12} className="text-[#FF5E1A]" />
+              <span>JSON</span>
+              <ChevronDown size={10} className={`transition-transform ${jsonMenuOpen ? "rotate-180" : ""}`} />
+            </button>
+
+            {jsonMenuOpen && (
+              <>
+                <div
+                  className="fixed inset-0 z-30"
+                  onClick={() => setJsonMenuOpen(false)}
+                />
+                <div className="absolute left-0 top-full z-40 mt-1.5 w-36 rounded-lg border border-[#E8E4DC] bg-white p-1 shadow-lg text-xs">
+                  <button
+                    type="button"
+                    onClick={handleBackupJson}
+                    className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-[#1A1A1A] hover:bg-[#FFF3EB] hover:text-[#FF5E1A] transition-colors"
+                  >
+                    <Download size={13} />
+                    <span>Backup JSON</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => fileImportRef.current?.click()}
+                    className="flex w-full items-center gap-2 rounded px-2 py-1.5 text-left text-[#1A1A1A] hover:bg-[#FFF3EB] hover:text-[#FF5E1A] transition-colors"
+                  >
+                    <Upload size={13} />
+                    <span>Import JSON</span>
+                  </button>
+                </div>
+              </>
+            )}
+
+            <input
+              type="file"
+              ref={fileImportRef}
+              onChange={handleImportFile}
+              accept=".json,application/json"
+              className="hidden"
+            />
+          </div>
         </div>
 
         {/* Action Buttons */}
@@ -117,32 +232,33 @@ export function RightToolbarPane({ onDownload, isDownloading }) {
           <label className="block text-[11px] font-semibold uppercase tracking-wider text-[#666055]">
             Text Formatting
           </label>
-
+          
           {/* Font Selector */}
           <div>
             <div className="mb-1 text-[11px] font-medium text-[#1A1A1A]">
-              Font Family
+              Font Family (ATS Presets)
             </div>
             <div className="grid grid-cols-2 gap-1.5">
               {[
-                { label: "Poppins", font: "Poppins", class: "font-sans" },
-                {
-                  label: "Courgette",
-                  font: "Courgette",
-                  class: "font-display",
-                },
+                { label: "Poppins", font: "Poppins", desc: "Clean Sans" },
+                { label: "Inter", font: "Inter", desc: "ATS Standard" },
+                { label: "Roboto", font: "Roboto", desc: "Crisp Sans" },
+                { label: "Calibri", font: "Lato", desc: "Modern ATS" },
+                { label: "Garamond", font: "Garamond", desc: "Executive" },
+                { label: "Courgette", font: "Courgette", desc: "Signature" },
               ].map((f) => (
                 <button
                   key={f.font}
                   type="button"
                   onClick={() => setFormatting({ fontFamily: f.font })}
-                  className={`flex items-center justify-center rounded-lg border px-2.5 py-1.5 text-xs transition-all ${
+                  className={`flex flex-col items-center justify-center rounded-lg border px-2 py-1.5 text-xs transition-all ${
                     activeFontFamily === f.font
                       ? "border-[#FF5E1A] bg-[#FFF3EB] text-[#FF5E1A] font-semibold shadow-sm"
                       : "border-[#E8E4DC] bg-white text-[#1A1A1A] hover:bg-[#F5F2EC]"
-                  } ${f.class}`}
+                  }`}
                 >
-                  {f.label}
+                  <span className="font-semibold text-xs">{f.label}</span>
+                  <span className="text-[9.5px] text-[#666055]">{f.desc}</span>
                 </button>
               ))}
             </div>
@@ -326,6 +442,35 @@ export function RightToolbarPane({ onDownload, isDownloading }) {
                       </div>
                     </button>
                   ))}
+                </div>
+
+                {/* Margin Density Selector */}
+                <div className="mt-3 pt-2.5 border-t border-[#E8E4DC]">
+                  <div className="mb-1.5 flex items-center justify-between text-[11px] font-medium text-[#1A1A1A]">
+                    <span>Margin Density</span>
+                    <span className="text-[10px] text-[#FF5E1A] font-semibold capitalize">{activeMarginDensity}</span>
+                  </div>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    {[
+                      { id: "compact", label: "Compact", desc: "12mm (p-4)" },
+                      { id: "standard", label: "Standard", desc: "20mm (p-8)" },
+                      { id: "spacious", label: "Spacious", desc: "28mm (p-12)" },
+                    ].map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        onClick={() => setFormatting({ marginDensity: m.id })}
+                        className={`rounded-lg border p-1.5 text-center transition-all ${
+                          activeMarginDensity === m.id
+                            ? "border-[#FF5E1A] bg-[#FFF3EB] text-[#FF5E1A] font-semibold shadow-xs"
+                            : "border-[#E8E4DC] bg-white text-[#1A1A1A] hover:bg-[#F5F2EC]"
+                        }`}
+                      >
+                        <div className="text-xs font-semibold">{m.label}</div>
+                        <div className="text-[9.5px] text-[#666055]">{m.desc}</div>
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </div>
             )}

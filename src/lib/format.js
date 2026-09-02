@@ -25,3 +25,30 @@ export function dateRange(item, endLabel = 'Present') {
   if (start && end) return `${start} — ${end}`
   return start || end
 }
+
+/**
+ * Cleans a URL for clean display text:
+ * Trims https://, http://, www., and trailing slashes.
+ * e.g., "https://github.com/shrawankarki/" -> "github.com/shrawankarki"
+ */
+export function cleanUrl(raw = '') {
+  if (!raw) return ''
+  return String(raw)
+    .trim()
+    .replace(/^https?:\/\//i, '')
+    .replace(/^www\./i, '')
+    .replace(/\/+$/, '')
+}
+
+/**
+ * Ensures URL has protocol for clickable href attributes.
+ */
+export function toHref(raw = '') {
+  if (!raw) return '#'
+  const trimmed = String(raw).trim()
+  if (/^https?:\/\//i.test(trimmed) || /^mailto:/i.test(trimmed) || /^tel:/i.test(trimmed)) {
+    return trimmed
+  }
+  return `https://${trimmed}`
+}
+

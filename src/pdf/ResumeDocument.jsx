@@ -609,14 +609,16 @@ function AtsStudioDoc({ data, t }) {
     <Page size={pageSize} style={{ paddingTop: 34, paddingRight: 36, paddingBottom: 34, paddingLeft: 36, fontFamily: 'Helvetica', color: '#1A1A1A' }}>
       {/* Header with Avatar & Name */}
       <View style={{ flexDirection: 'row', alignItems: 'center', paddingBottom: 12, marginBottom: 12, borderBottomWidth: 1, borderBottomColor: `${accent}40` }}>
-        {clean(basic.avatar) ? (
-          <Image src={basic.avatar} style={{ width: 50, height: 50, borderRadius: 25, marginRight: 14 }} />
-        ) : (
-          <View style={{ width: 46, height: 46, borderRadius: 23, borderWidth: 1.5, borderColor: accent, alignItems: 'center', justifyContent: 'center', marginRight: 14, backgroundColor: '#FBF9F5' }}>
-            <Text style={{ fontSize: 18, fontFamily: 'Helvetica-Bold', color: accent }}>
-              {clean(basic.fullName) ? clean(basic.fullName).charAt(0).toUpperCase() : 'R'}
-            </Text>
-          </View>
+        {!basic.hidePhotoForAts && (
+          clean(basic.avatar) ? (
+            <Image src={basic.avatar} style={{ width: 50, height: 50, borderRadius: 25, marginRight: 14 }} />
+          ) : (
+            <View style={{ width: 46, height: 46, borderRadius: 23, borderWidth: 1.5, borderColor: accent, alignItems: 'center', justifyContent: 'center', marginRight: 14, backgroundColor: '#FBF9F5' }}>
+              <Text style={{ fontSize: 18, fontFamily: 'Helvetica-Bold', color: accent }}>
+                {clean(basic.fullName) ? clean(basic.fullName).charAt(0).toUpperCase() : 'R'}
+              </Text>
+            </View>
+          )
         )}
         <View style={{ flex: 1 }}>
           <Text style={{ fontSize: 21, fontFamily: 'Helvetica-Bold', color: '#1A1A1A', letterSpacing: -0.2 }}>

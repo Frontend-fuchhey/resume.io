@@ -10,6 +10,7 @@ import {
   freshProject,
   freshSkillGroup,
   freshWebsite,
+  defaultSectionOrder,
 } from '../lib/factory'
 import { sampleData } from '../lib/sample'
 
@@ -46,6 +47,7 @@ function snapshotState(state) {
     projects: JSON.parse(JSON.stringify(state.projects)),
     certifications: JSON.parse(JSON.stringify(state.certifications)),
     visibility: JSON.parse(JSON.stringify(state.visibility)),
+    sectionOrder: JSON.parse(JSON.stringify(state.sectionOrder || defaultSectionOrder())),
     templateId: state.templateId,
     formatting: JSON.parse(JSON.stringify(state.formatting || freshFormatting())),
   }
@@ -230,13 +232,48 @@ export const useResumeStore = create(
           ),
         })),
 
+      // ---- section ordering ---------------------------------------------
+      reorderSections: (nextOrder) => {
+        get().pushHistory()
+        set({ sectionOrder: nextOrder })
+      },
+
+      moveSection: (key, dir) => {
+        get().pushHistory()
+        set((s) => {
+          const currentOrder = s.sectionOrder || defaultSectionOrder()
+          const i = currentOrder.indexOf(key)
+          if (i === -1) return s
+          return { sectionOrder: shiftBy(currentOrder, i, dir) }
+        })
+      },
+
+      // ---- import & backup ----------------------------------------------
+      importResume: (data) => {
+        get().pushHistory()
+        set({
+          basic: { ...freshBasic(), ...(data.basic || {}) },
+          experience: data.experience || [],
+          education: data.education || [],
+          websites: data.websites || [],
+          skillGroups: data.skillGroups || [],
+          hobbies: data.hobbies || [],
+          projects: data.projects || [],
+          certifications: data.certifications || [],
+          visibility: { ...blankVisibility(), ...(data.visibility || {}) },
+          sectionOrder: data.sectionOrder || defaultSectionOrder(),
+          templateId: data.templateId || 'ats-studio',
+          formatting: { ...freshFormatting(), ...(data.formatting || {}) },
+        })
+      },
+
       // ---- meta ---------------------------------------------------------
       setTemplate: (templateId) => set({ templateId }),
       toggleSection: (key) =>
         set((s) => ({ visibility: { ...s.visibility, [key]: !s.visibility[key] } })),
 
       resetAll: () => set(() => ({ ...blankResume(), history: [], future: [] })),
-      loadSample: () => set(() => ({ ...sampleData(), history: [], future: [] })),
+      loadSample: () => set(() => ({ ...sampleData(), sectionOrder: defaultSectionOrder(), history: [], future: [] })),
     }),
     {
       name: 'resume-io-studio-v2',

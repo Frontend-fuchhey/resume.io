@@ -1,6 +1,7 @@
 import { Globe, Plus, Trash2 } from 'lucide-react'
 import { useResumeStore } from '../../store/useResumeStore'
 import { Field, TextInput } from '../ui/fields'
+import { cleanUrl } from '../../lib/format'
 
 export function WebsitesManager() {
   const websites = useResumeStore((s) => s.websites || [])
@@ -41,9 +42,14 @@ export function WebsitesManager() {
                     <TextInput
                       value={w.url || ''}
                       onChange={(e) => update(w.id, { url: e.target.value })}
-                      placeholder="e.g. linkedin.com/in/username"
+                      placeholder="e.g. https://linkedin.com/in/username"
                       compact
                     />
+                    {w.url && (
+                      <p className="mt-0.5 truncate text-[10px] text-[#666055]">
+                        Display: <span className="font-mono text-[#FF5E1A]">{cleanUrl(w.url)}</span>
+                      </p>
+                    )}
                   </Field>
                 </div>
                 <button
