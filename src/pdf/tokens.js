@@ -1,0 +1,55 @@
+/**
+ * PDF color/typography tokens — mirror each HTML template’s vibe while using
+ * the fonts embedded in @react-pdf/renderer (real text, not flattened images,
+ * so every word stays selectable & ATS-parseable).
+ */
+export const PDF_THEMES = {
+  'ats-studio': {
+    id: 'ats-studio',
+    bodyFont: 'Helvetica',
+    boldFont: 'Helvetica-Bold',
+    italicFont: 'Helvetica-Oblique',
+    accent: '#244CEC',
+    ink: '#1A1A1A',
+    muted: '#666055',
+    bodySize: 9.4,
+    header: 'studio-header',
+    section: 'studio',
+  },
+  classic: {
+    id: 'classic',
+    bodyFont: 'Helvetica',
+    boldFont: 'Helvetica-Bold',
+    italicFont: 'Helvetica-Oblique',
+    accent: '#1A1A1A',
+    ink: '#1A1A1A',
+    muted: '#666055',
+    bodySize: 9.6,
+    header: 'center-caps',
+    section: 'rule',
+  },
+  tech: {
+    id: 'tech',
+    bodyFont: 'Helvetica',
+    boldFont: 'Helvetica-Bold',
+    italicFont: 'Helvetica-Oblique',
+    accent: '#244CEC',
+    ink: '#1A1A1A',
+    muted: '#666055',
+    bodySize: 9.4,
+    header: 'left-block',
+    section: 'tech',
+  },
+  exec: {
+    id: 'exec',
+    bodyFont: 'Times-Roman',
+    boldFont: 'Times-Bold',
+    italicFont: 'Times-Italic',
+    accent: '#FF5E1A',
+    ink: '#1A1A1A',
+    muted: '#666055',
+    bodySize: 9.8,
+    header: 'center-serif',
+    section: 'letterspaced',
+  },
+}
