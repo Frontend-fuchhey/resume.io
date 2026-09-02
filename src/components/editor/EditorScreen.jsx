@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { ArrowLeft, FileText, Layers, PenTool } from 'lucide-react'
+import { ArrowLeft, FileText, Layers, PenTool, UserCircle2 } from 'lucide-react'
 import { Brand } from '../brand'
 import { ResumeEditor } from './ResumeEditor'
 import { TemplateGallery } from './TemplateGallery'
@@ -9,12 +9,14 @@ import { useResumeStore } from '../../store/useResumeStore'
 import { toast } from '../../store/useUIStore'
 import { exportResumePdf } from '../../pdf/exportPdf'
 import { resumeFilename } from '../../lib/names'
+import { AboutCreatorModal } from '../AboutCreatorModal'
 
 export function EditorScreen({ onHome }) {
   const resume = useResumeStore()
   const [leftTab, setLeftTab] = useState('create') // 'create' | 'templates'
   const [busy, setBusy] = useState(false)
   const [mobilePane, setMobilePane] = useState('canvas') // 'left' | 'canvas' | 'right'
+  const [aboutOpen, setAboutOpen] = useState(false)
 
   const rawName = resume.basic.fullName?.trim() || ''
   const displayName = rawName || 'Untitled Resume'
@@ -66,6 +68,17 @@ export function EditorScreen({ onHome }) {
               </div>
             </div>
           </div>
+          {/* ── About Creator button ── */}
+          <button
+            type="button"
+            onClick={() => setAboutOpen(true)}
+            title="About Creator"
+            aria-label="About Creator"
+            className="group flex items-center gap-1.5 rounded-lg border border-[#E5E2DC] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#666055] transition-all hover:border-[#FF5E1A] hover:text-[#FF5E1A] hover:bg-[#FFF3EB]"
+          >
+            <UserCircle2 size={14} className="shrink-0 transition-colors group-hover:text-[#FF5E1A]" />
+            <span className="hidden sm:inline">About</span>
+          </button>
         </div>
 
         {/* Tab Switcher at the Top: Create | Templates */}
@@ -159,6 +172,9 @@ export function EditorScreen({ onHome }) {
           <span>Design</span>
         </button>
       </div>
+
+      {/* About Creator Modal */}
+      <AboutCreatorModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
     </div>
   )
 }
