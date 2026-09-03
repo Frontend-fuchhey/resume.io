@@ -7,30 +7,36 @@ const SANS = "'Inter', system-ui, sans-serif"
 const DISPLAY = "'Space Grotesk', 'Inter', sans-serif"
 const MONO = "'JetBrains Mono', ui-monospace, monospace"
 
-function RailHead({ children }) {
-  const accent = TEMPLATE_BY_ID.tech.accent
+function RailHead({ children, accent }) {
   return (
-    <h2 className="mb-2 mt-4 flex items-center gap-1.5 text-[9.5px] font-bold uppercase tracking-[0.18em] first:mt-0" style={{ color: accent }}>
-      <span className="inline-block h-3 w-[3px] rounded-full" style={{ background: accent }} />
-      {children}
-    </h2>
-  )
-}
-
-function MainHead({ children }) {
-  return (
-    <div className="mb-2 mt-4 flex items-center gap-2">
-      <h2 className="whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.24em] text-slate-700" style={{ fontFamily: DISPLAY }}>
-        {children}
-      </h2>
-      <span className="h-px flex-1 bg-slate-300" />
+    <div className="mb-2 mt-4 first:mt-0">
+      <div className="flex items-center gap-1.5">
+        <span className="inline-block h-3 w-[3px] rounded-full" style={{ backgroundColor: accent }} />
+        <h2 className="text-[9.5px] font-bold uppercase tracking-[0.18em]" style={{ color: accent }}>
+          {children}
+        </h2>
+      </div>
+      <div style={{ backgroundColor: accent }} className="h-0.5 w-full my-1 opacity-40" />
     </div>
   )
 }
 
-export default function TechTemplate({ resume }) {
-  const accent = TEMPLATE_BY_ID.tech.accent
-  const { basic, experience, education, skillGroups, projects, certifications, visibility } = resume
+function MainHead({ children, accent }) {
+  return (
+    <div className="mb-2 mt-4">
+      <div className="flex items-center gap-2">
+        <h2 className="whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: accent, fontFamily: DISPLAY }}>
+          {children}
+        </h2>
+        <div className="h-0.5 flex-1" style={{ backgroundColor: accent, opacity: 0.35 }} />
+      </div>
+    </div>
+  )
+}
+
+export default function TechTemplate({ resume, theme }) {
+  const { basic, experience, education, skillGroups, projects, certifications, visibility, formatting } = resume
+  const accent = theme?.accentColor || formatting?.accentColor || TEMPLATE_BY_ID.tech?.accent || '#244CEC'
   const contact = [
     { Icon: Mail, label: basic.email },
     { Icon: Phone, label: basic.phone },
@@ -42,7 +48,7 @@ export default function TechTemplate({ resume }) {
   return (
     <div className="flex flex-col" style={{ padding: '36px 34px 40px', color: '#111827', fontFamily: SANS, fontSize: '9.8px', lineHeight: 1.5 }}>
       {/* Masthead */}
-      <header className="flex items-end justify-between gap-4 border-b-2 pb-3" style={{ borderColor: accent }}>
+      <header className="flex items-end justify-between gap-4 pb-3">
         <div>
           <h1 className="text-[22px] font-bold tracking-tight" style={{ fontFamily: DISPLAY }}>
             {basic.fullName || 'Your Name'}
@@ -60,6 +66,7 @@ export default function TechTemplate({ resume }) {
           ))}
         </div>
       </header>
+      <div style={{ backgroundColor: accent }} className="h-0.5 w-full mt-1 mb-2" />
 
       {basic.summary && (
         <p className="mt-3 rounded-md border-l-2 py-0.5 pl-2.5 text-justify text-[9.6px] leading-relaxed" style={{ borderColor: accent }}>
@@ -72,7 +79,7 @@ export default function TechTemplate({ resume }) {
         <div className="min-w-0 flex-1">
           {visibility.experience && experience.some((e) => e.role || e.company || e.bullets.some(Boolean)) && (
             <section>
-              <MainHead>Experience</MainHead>
+              <MainHead accent={accent}>Experience</MainHead>
               <div className="space-y-2.5">
                 {experience
                   .filter((e) => e.role || e.company || e.bullets.some(Boolean))
@@ -90,7 +97,7 @@ export default function TechTemplate({ resume }) {
                       </p>
                       <div className="mt-1 space-y-[2.5px]">
                         {exp.bullets.map((b, i) => (
-                          <Bullet key={i} expId={exp.id} index={i} text={b} marker="▸" className="gap-1.5" markerClass="text-[7px] text-slate-400" />
+                          <Bullet key={i} expId={exp.id} index={i} text={b} marker="▸" className="gap-1.5" markerClass="text-[7px]" markerStyle={{ color: accent }} />
                         ))}
                         <AddBulletButton expId={exp.id} className="opacity-0 transition-opacity group-hover/exp:opacity-100" />
                       </div>
@@ -102,7 +109,7 @@ export default function TechTemplate({ resume }) {
 
           {visibility.projects && projects.some((p) => p.name || p.description) && (
             <section>
-              <MainHead>Projects</MainHead>
+              <MainHead accent={accent}>Projects</MainHead>
               <div className="space-y-1.5">
                 {projects
                   .filter((p) => p.name || p.description)
@@ -110,7 +117,7 @@ export default function TechTemplate({ resume }) {
                     <div key={p.id} className="break-inside-avoid">
                       <p className="text-[10px] font-bold">
                         {p.name}
-                        {p.link && <span className="ml-1 font-normal text-[8.8px]" style={{ color: '#2563eb' }}>{p.link}</span>}
+                        {p.link && <span className="ml-1 font-normal text-[8.8px]" style={{ color: accent }}>{p.link}</span>}
                       </p>
                       {p.description && <p className="text-justify text-[9.4px]">{p.description}</p>}
                     </div>
@@ -121,10 +128,10 @@ export default function TechTemplate({ resume }) {
         </div>
 
         {/* Side rail */}
-        <aside className="w-[172px] shrink-0 border-l border-slate-200 pl-4" style={{ borderColor: '#e2e8f0' }}>
+        <aside className="w-[172px] shrink-0 border-l border-slate-200 pl-4" style={{ borderColor: `${accent}35` }}>
           {visibility.skills && skillGroups.some((g) => g.items.some((x) => x.trim())) && (
             <section>
-              <RailHead>Skills</RailHead>
+              <RailHead accent={accent}>Skills</RailHead>
               <div className="space-y-1.5">
                 {skillGroups
                   .filter((g) => g.items.some((x) => x.trim()))
@@ -145,7 +152,7 @@ export default function TechTemplate({ resume }) {
 
           {visibility.education && education.some((e) => e.degree || e.school) && (
             <section>
-              <RailHead>Education</RailHead>
+              <RailHead accent={accent}>Education</RailHead>
               <div className="space-y-1.5">
                 {education
                   .filter((e) => e.degree || e.school)
@@ -165,7 +172,7 @@ export default function TechTemplate({ resume }) {
 
           {visibility.certifications && certifications.some((c) => c.name) && (
             <section>
-              <RailHead>Certifications</RailHead>
+              <RailHead accent={accent}>Certifications</RailHead>
               <div className="space-y-1">
                 {certifications
                   .filter((c) => c.name)

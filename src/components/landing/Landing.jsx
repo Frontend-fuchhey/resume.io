@@ -11,8 +11,16 @@ import {
   Wand2,
   UserCircle2,
 } from "lucide-react";
-import { Brand } from "../brand";
+import logoImg from '../assets/resume-io.png';
 import { Button } from "../ui/primitives";
+
+function Link({ to = '/', className, children, ...props }) {
+  return (
+    <a href={to} className={className} {...props}>
+      {children}
+    </a>
+  );
+}
 import { TEMPLATES } from "../../config/templates";
 import { MiniPreview } from "../wizard/TemplateGrid";
 import { hasResumeData, useResumeStore } from "../../store/useResumeStore";
@@ -48,7 +56,13 @@ export function Landing({ onStart, onContinue, onSample }) {
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-5 pb-16">
       <header className="flex items-center justify-between py-6">
-        <Brand size={32} />
+        <Link className="flex items-center" to="/">
+          <img 
+            src={logoImg} 
+            alt="resume.io" 
+            className="h-8 w-auto object-contain hover:opacity-90 transition-opacity" 
+          />
+        </Link>
         {/* ── About Creator button ── */}
         <button
           type="button"

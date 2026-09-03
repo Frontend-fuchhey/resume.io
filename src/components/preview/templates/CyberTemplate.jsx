@@ -11,20 +11,20 @@ function Section({ title, accent, children }) {
   return (
     <section className="mt-5">
       <div className="mb-2 flex items-center gap-2">
-        <span className="h-2 w-2 rounded-[2px]" style={{ background: accent }} />
-        <h2 className="text-[10.5px] font-bold uppercase tracking-[0.22em]" style={{ fontFamily: HEAD }}>
+        <span className="h-2 w-2 rounded-[2px]" style={{ backgroundColor: accent }} />
+        <h2 className="text-[10.5px] font-bold uppercase tracking-[0.22em]" style={{ fontFamily: HEAD, color: accent }}>
           {title}
         </h2>
-        <span className="h-px flex-1" style={{ background: `${accent}44` }} />
+        <div className="h-0.5 flex-1" style={{ backgroundColor: accent, opacity: 0.35 }} />
       </div>
       {children}
     </section>
   )
 }
 
-export default function CyberTemplate({ resume }) {
+export default function CyberTemplate({ resume, theme }) {
   const t = TEMPLATE_BY_ID.cyber
-  const accent = t.accent
+  const accent = theme?.accentColor || resume?.formatting?.accentColor || t?.accent || '#0e7490'
   const { basic, experience, education, skillGroups, projects, certifications, visibility } = resume
 
   const contact = [
@@ -83,7 +83,7 @@ export default function CyberTemplate({ resume }) {
                     <div className="mt-1.5 space-y-[3px]">
                       {exp.bullets.map((b, i) => (
                         <Bullet key={i} expId={exp.id} index={i} text={b} markerClass="text-[8px]"
-                          marker="✦" className="gap-1.5" />
+                          marker="✦" className="gap-1.5" markerStyle={{ color: accent }} />
                       ))}
                       <AddBulletButton expId={exp.id} className="opacity-0 transition-opacity group-hover/exp:opacity-100" />
                     </div>

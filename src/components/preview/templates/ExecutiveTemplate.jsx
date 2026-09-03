@@ -6,21 +6,20 @@ import { AddBulletButton, Bullet } from '../Bullet'
 const SERIF = "'Playfair Display', Georgia, serif"
 const SANS = "'Inter', system-ui, sans-serif"
 
-function Head({ children }) {
-  const accent = TEMPLATE_BY_ID.exec.accent
+function Head({ children, accent }) {
   return (
     <div className="mb-2.5 mt-5 text-center">
-      <h2 className="text-[11px] font-semibold uppercase tracking-[0.34em]" style={{ fontFamily: SERIF, color: '#0f172a' }}>
+      <h2 className="text-[11px] font-semibold uppercase tracking-[0.34em]" style={{ fontFamily: SERIF, color: accent || '#0f172a' }}>
         {children}
       </h2>
-      <div className="mx-auto mt-1 h-px w-12" style={{ background: accent }} />
+      <div className="mx-auto my-1 h-0.5 w-14" style={{ backgroundColor: accent }} />
     </div>
   )
 }
 
-export default function ExecutiveTemplate({ resume }) {
-  const accent = TEMPLATE_BY_ID.exec.accent
-  const { basic, experience, education, skillGroups, projects, certifications, visibility } = resume
+export default function ExecutiveTemplate({ resume, theme }) {
+  const { basic, experience, education, skillGroups, projects, certifications, visibility, formatting } = resume
+  const accent = theme?.accentColor || formatting?.accentColor || TEMPLATE_BY_ID.exec?.accent || '#FF5E1A'
   const contact = [
     { Icon: Phone, label: basic.phone },
     { Icon: Mail, label: basic.email },
@@ -41,23 +40,23 @@ export default function ExecutiveTemplate({ resume }) {
             {basic.jobTitle}
           </p>
         )}
-        <div className="mx-auto mt-4 h-px w-full bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
+        <div className="mx-auto mt-4 h-0.5 w-full opacity-30" style={{ backgroundColor: accent }} />
         {contact.length > 0 && (
           <div className="mt-3 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-[9.2px] uppercase tracking-[0.14em] text-slate-500">
             {contact.map(({ Icon, label }) => (
               <span key={label} className="inline-flex items-center gap-1.5">
-                <Icon size={10} className="text-slate-400" />
+                <Icon size={10} style={{ color: accent }} />
                 {label}
               </span>
             ))}
           </div>
         )}
-        <div className="mx-auto mt-4 h-px w-full bg-gradient-to-r from-transparent via-slate-300 to-transparent" />
+        <div className="mx-auto mt-4 h-0.5 w-full opacity-30" style={{ backgroundColor: accent }} />
       </header>
 
       {basic.summary && (
         <section>
-          <Head>Profile</Head>
+          <Head accent={accent}>Profile</Head>
           <p className="text-center text-justify italic leading-relaxed" style={{ fontFamily: SERIF }}>
             {basic.summary}
           </p>
@@ -66,7 +65,7 @@ export default function ExecutiveTemplate({ resume }) {
 
       {visibility.experience && experience.some((e) => e.role || e.company || e.bullets.some(Boolean)) && (
         <section>
-          <Head>Professional Experience</Head>
+          <Head accent={accent}>Professional Experience</Head>
           <div className="space-y-3.5">
             {experience
               .filter((e) => e.role || e.company || e.bullets.some(Boolean))
@@ -86,7 +85,7 @@ export default function ExecutiveTemplate({ resume }) {
                   </div>
                   <div className="mt-1.5 space-y-[3px]">
                     {exp.bullets.map((b, i) => (
-                      <Bullet key={i} expId={exp.id} index={i} text={b} marker="—" className="gap-2" markerClass="text-[7px] translate-y-[1px]" />
+                      <Bullet key={i} expId={exp.id} index={i} text={b} marker="—" className="gap-2" markerClass="text-[7px] translate-y-[1px]" markerStyle={{ color: accent }} />
                     ))}
                     <AddBulletButton expId={exp.id} className="opacity-0 transition-opacity group-hover/exp:opacity-100" />
                   </div>
@@ -98,7 +97,7 @@ export default function ExecutiveTemplate({ resume }) {
 
       {visibility.projects && projects.some((p) => p.name || p.description) && (
         <section>
-          <Head>Selected Projects</Head>
+          <Head accent={accent}>Selected Projects</Head>
           <div className="space-y-2">
             {projects
               .filter((p) => p.name || p.description)
@@ -107,7 +106,7 @@ export default function ExecutiveTemplate({ resume }) {
                   <p className="text-[11px] font-bold" style={{ fontFamily: SERIF }}>
                     {p.name}
                     {p.link && (
-                      <span className="ml-1 font-normal normal-case tracking-normal" style={{ color: '#1d4ed8' }}>
+                      <span className="ml-1 font-normal normal-case tracking-normal" style={{ color: accent }}>
                         {p.link}
                       </span>
                     )}
@@ -122,7 +121,7 @@ export default function ExecutiveTemplate({ resume }) {
       <div className="grid grid-cols-2 gap-8">
         {visibility.education && education.some((e) => e.degree || e.school) && (
           <section>
-            <Head>Education</Head>
+            <Head accent={accent}>Education</Head>
             <div className="space-y-2">
               {education
                 .filter((e) => e.degree || e.school)
@@ -143,7 +142,7 @@ export default function ExecutiveTemplate({ resume }) {
         )}
         {visibility.certifications && certifications.some((c) => c.name) && (
           <section>
-            <Head>Certifications</Head>
+            <Head accent={accent}>Certifications</Head>
             <div className="space-y-1 text-center">
               {certifications
                 .filter((c) => c.name)
@@ -160,7 +159,7 @@ export default function ExecutiveTemplate({ resume }) {
 
       {visibility.skills && skillGroups.some((g) => g.items.some((x) => x.trim())) && (
         <section>
-          <Head>Core Competencies</Head>
+          <Head accent={accent}>Core Competencies</Head>
           <div className="grid grid-cols-2 gap-x-8 gap-y-1.5">
             {skillGroups
               .filter((g) => g.items.some((x) => x.trim()))

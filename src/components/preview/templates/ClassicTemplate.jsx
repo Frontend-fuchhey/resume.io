@@ -7,17 +7,20 @@ const INK = '#111827'
 const MUTED = '#4b5563'
 const F = "'Inter', system-ui, sans-serif"
 
-function Head({ title }) {
-  const { accent } = TEMPLATE_BY_ID.classic
+function Head({ title, accent }) {
   return (
-    <h2 className="mb-2 mt-4 border-b-2 pb-1 text-[11px] font-bold uppercase tracking-[0.16em]" style={{ color: INK, borderColor: accent, fontFamily: F }}>
-      {title}
-    </h2>
+    <div className="mb-2 mt-4">
+      <h2 className="text-[11px] font-bold uppercase tracking-[0.16em]" style={{ color: accent || INK, fontFamily: F }}>
+        {title}
+      </h2>
+      <div style={{ backgroundColor: accent || INK }} className="h-0.5 w-full my-1" />
+    </div>
   )
 }
 
-export default function ClassicTemplate({ resume }) {
-  const { basic, experience, education, skillGroups, projects, certifications, visibility } = resume
+export default function ClassicTemplate({ resume, theme }) {
+  const { basic, experience, education, skillGroups, projects, certifications, visibility, formatting } = resume
+  const accentColor = theme?.accentColor || formatting?.accentColor || TEMPLATE_BY_ID.classic?.accent || '#1A1A1A'
   const contact = [
     basic.email && { Icon: Mail, label: basic.email },
     basic.phone && { Icon: Phone, label: basic.phone },
@@ -34,7 +37,7 @@ export default function ClassicTemplate({ resume }) {
           {basic.fullName || 'Your Name'}
         </h1>
         {basic.jobTitle && (
-          <p className="mt-0.5 text-[11.5px] font-medium tracking-[0.04em]" style={{ color: MUTED }}>
+          <p className="mt-0.5 text-[11.5px] font-medium tracking-[0.04em]" style={{ color: accentColor }}>
             {basic.jobTitle}
           </p>
         )}
@@ -42,23 +45,24 @@ export default function ClassicTemplate({ resume }) {
           <div className="mt-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5 text-[9.5px]">
             {contact.map(({ Icon, label }) => (
               <span key={label} className="inline-flex items-center gap-1 text-slate-600">
-                <Icon size={10} strokeWidth={2} /> {label}
+                <Icon size={10} strokeWidth={2} style={{ color: accentColor }} /> {label}
               </span>
             ))}
           </div>
         )}
+        <div style={{ backgroundColor: accentColor }} className="mx-auto mt-3 h-0.5 w-full opacity-25" />
       </header>
 
       {basic.summary && (
         <section>
-          <Head title="Summary" />
+          <Head title="Summary" accent={accentColor} />
           <p className="text-justify" style={{ color: INK }}>{basic.summary}</p>
         </section>
       )}
 
       {visibility.experience && experience.some((e) => e.role || e.company || e.bullets.some(Boolean)) && (
         <section>
-          <Head title="Work Experience" />
+          <Head title="Work Experience" accent={accentColor} />
           <div className="space-y-3">
             {experience.map((exp) => {
               const show = exp.role || exp.company || exp.bullets.some(Boolean)
@@ -78,7 +82,7 @@ export default function ClassicTemplate({ resume }) {
                   {exp.location && <p className="text-[9.6px] italic" style={{ color: MUTED }}>{exp.location}</p>}
                   <div className="mt-1 space-y-[3px]">
                     {exp.bullets.map((b, i) => (
-                      <Bullet key={i} expId={exp.id} index={i} text={b} className="text-[10.1px]" />
+                      <Bullet key={i} expId={exp.id} index={i} text={b} className="text-[10.1px]" markerStyle={{ color: accentColor }} />
                     ))}
                     <AddBulletButton expId={exp.id} className="opacity-100" />
                   </div>
@@ -91,7 +95,7 @@ export default function ClassicTemplate({ resume }) {
 
       {visibility.skills && skillGroups.some((g) => g.label.trim() && g.items.some((t) => t.trim())) && (
         <section>
-          <Head title="Skills & Tools" />
+          <Head title="Skills & Tools" accent={accentColor} />
           <div className="space-y-1">
             {skillGroups
               .filter((g) => g.label.trim() && g.items.some((t) => t.trim()))
@@ -108,7 +112,7 @@ export default function ClassicTemplate({ resume }) {
 
       {visibility.projects && projects.some((p) => p.name || p.description) && (
         <section>
-          <Head title="Projects" />
+          <Head title="Projects" accent={accentColor} />
           <div className="space-y-2">
             {projects
               .filter((p) => p.name || p.description)
@@ -117,7 +121,7 @@ export default function ClassicTemplate({ resume }) {
                   <p className="text-[10.8px] font-bold">
                     {p.name}
                     {p.link && (
-                      <span className="ml-1.5 font-medium normal-case tracking-normal" style={{ color: '#2563eb' }}>
+                      <span className="ml-1.5 font-medium normal-case tracking-normal" style={{ color: accentColor }}>
                         {p.link}
                       </span>
                     )}
@@ -131,7 +135,7 @@ export default function ClassicTemplate({ resume }) {
 
       {visibility.education && education.some((e) => e.degree || e.school) && (
         <section>
-          <Head title="Education" />
+          <Head title="Education" accent={accentColor} />
           <div className="space-y-1.5">
             {education
               .filter((e) => e.degree || e.school)
@@ -154,7 +158,7 @@ export default function ClassicTemplate({ resume }) {
 
       {visibility.certifications && certifications.some((c) => c.name) && (
         <section>
-          <Head title="Certifications" />
+          <Head title="Certifications" accent={accentColor} />
           <div className="space-y-0.5">
             {certifications
               .filter((c) => c.name)

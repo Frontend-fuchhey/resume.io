@@ -1,10 +1,10 @@
 import { useRef } from 'react'
 import { Reorder, useDragControls } from 'framer-motion'
-import { Briefcase, CalendarRange, ChevronDown, ChevronUp, GripVertical, Plus, Trash2 } from 'lucide-react'
+import { Briefcase, ChevronDown, ChevronUp, GripVertical, Plus, Trash2 } from 'lucide-react'
 import { useResumeStore } from '../../store/useResumeStore'
 import { RichTextToolbar } from './RichTextToolbar'
 import { ArrowButton } from '../ui/primitives'
-import { Field, TextInput, Toggle } from '../ui/fields'
+import { Field, TextInput } from '../ui/fields'
 import { ConfirmDelete } from '../ui/ConfirmDelete'
 import { dateRange } from '../../lib/format'
 
@@ -65,7 +65,7 @@ function ExperienceItem(props) {
       layout
       dragListener={false}
       dragControls={controls}
-      className="rounded-xl border border-[#E8E4DC] bg-white p-3.5 shadow-card"
+      className="rounded-xl border border-[#E8E4DC] bg-white p-6 overflow-hidden shadow-card"
     >
       <ExperienceCard {...props} controls={controls} />
     </Reorder.Item>
@@ -75,6 +75,7 @@ function ExperienceItem(props) {
 function ExperienceCard({ item, index, total, onPatch, onRemove, onMove, onBullets, controls }) {
   const activeBulletRef = useRef(null)
   const bullets = item.bullets && item.bullets.length > 0 ? item.bullets : ['']
+  const isCurrent = Boolean(item.current)
 
   const updateBullet = (i, text) => {
     const next = [...bullets]
@@ -126,7 +127,7 @@ function ExperienceCard({ item, index, total, onPatch, onRemove, onMove, onBulle
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         <Field label="Job Title">
           <TextInput
             value={item.role || ''}
@@ -143,7 +144,7 @@ function ExperienceCard({ item, index, total, onPatch, onRemove, onMove, onBulle
             compact
           />
         </Field>
-        <Field label="Location">
+        <Field label="Location" className="sm:col-span-2">
           <TextInput
             value={item.location || ''}
             onChange={(e) => onPatch({ location: e.target.value })}
@@ -151,32 +152,38 @@ function ExperienceCard({ item, index, total, onPatch, onRemove, onMove, onBulle
             compact
           />
         </Field>
-        <div className="flex items-end gap-2">
-          <Field label="Start Date" className="flex-1">
-            <TextInput
-              type="month"
-              value={item.startDate || ''}
-              onChange={(e) => onPatch({ startDate: e.target.value })}
-              compact
-            />
-          </Field>
-          {item.current ? (
-            <div className="mb-px flex h-[34px] flex-1 items-center justify-center gap-1 rounded-lg border border-[#D1EED5] bg-[#EBF7EE] text-xs font-medium text-[#1E7E34]">
-              <CalendarRange size={12} /> Present
-            </div>
-          ) : (
-            <Field label="End Date" className="flex-1">
-              <TextInput
-                type="month"
-                value={item.endDate || ''}
-                onChange={(e) => onPatch({ endDate: e.target.value })}
-                compact
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-center mt-3">
+        <div className="flex flex-col gap-1">
+          <label className="text-xs font-medium text-gray-700">Start Date</label>
+          <input
+            type="date"
+            value={item.startDate ? (item.startDate.length === 7 ? `${item.startDate}-01` : item.startDate) : ''}
+            onChange={(e) => onPatch({ startDate: e.target.value })}
+            className="input-field"
+          />
+        </div>
+        <div className="flex flex-col gap-1 md:col-span-2">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-medium text-gray-700">End Date</label>
+            <label className="flex items-center gap-1.5 text-xs text-gray-500 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isCurrent}
+                onChange={(e) => onPatch({ current: e.target.checked })}
+                className="toggle-checkbox"
               />
-            </Field>
-          )}
-          <div className="pb-1">
-            <Toggle checked={Boolean(item.current)} onChange={(v) => onPatch({ current: v })} label="Current" />
+              <span>Current</span>
+            </label>
           </div>
+          <input
+            type="date"
+            disabled={isCurrent}
+            value={isCurrent ? '' : (item.endDate ? (item.endDate.length === 7 ? `${item.endDate}-01` : item.endDate) : '')}
+            onChange={(e) => onPatch({ endDate: e.target.value })}
+            className="input-field"
+          />
         </div>
       </div>
 

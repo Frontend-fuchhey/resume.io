@@ -32,7 +32,18 @@ export function PreviewProvider({ enabled, state, commitBullet, deleteBullet, ad
  * borderless textarea while the user edits. Used by every template so
  * click-to-edit works identically on all designs.
  */
-export function Bullet({ expId, index, text, marker = '•', markerClass, className, readOnly, placeholder }) {
+export function Bullet({
+  expId,
+  index,
+  text,
+  marker = '•',
+  markerClass,
+  className,
+  readOnly,
+  placeholder,
+  style,
+  markerStyle,
+}) {
   const ctx = usePreview()
   const [editing, setEditing] = useState(false)
   const [draft, setDraft] = useState('')
@@ -66,8 +77,8 @@ export function Bullet({ expId, index, text, marker = '•', markerClass, classN
   if (!interactive) {
     if (!text.trim()) return null
     return (
-      <div className={cn('flex gap-2', className)}>
-        <span className={cn('w-[1ch] shrink-0 select-none', markerClass)}>{marker}</span>
+      <div className={cn('flex gap-2', className)} style={style}>
+        <span className={cn('w-[1ch] shrink-0 select-none', markerClass)} style={markerStyle}>{marker}</span>
         <span className="min-w-0 flex-1">{text}</span>
       </div>
     )
@@ -75,9 +86,9 @@ export function Bullet({ expId, index, text, marker = '•', markerClass, classN
 
   if (editing) {
     return (
-      <div className="group relative -mx-1 rounded-lg bg-amber-50/90 p-1 ring-2 ring-amber-300/70 dark:bg-amber-400/10">
+      <div className="group relative -mx-1 rounded-lg bg-amber-50/90 p-1 ring-2 ring-amber-300/70 dark:bg-amber-400/10" style={style}>
         <div className="flex gap-1.5">
-          <span className={cn('w-[1ch] shrink-0 select-none pt-1', markerClass)}>{marker}</span>
+          <span className={cn('w-[1ch] shrink-0 select-none pt-1', markerClass)} style={markerStyle}>{marker}</span>
           <textarea
             ref={areaRef}
             rows={1}
@@ -123,10 +134,11 @@ export function Bullet({ expId, index, text, marker = '•', markerClass, classN
   }
 
   return (
-    <div className="group/bullet relative flex gap-2" onDoubleClick={startEdit}>
-      <span className={cn('w-[1ch] shrink-0 select-none', markerClass)}>{marker}</span>
+    <div className="group/bullet relative flex gap-2" onDoubleClick={startEdit} style={style}>
+      <span className={cn('w-[1ch] shrink-0 select-none', markerClass)} style={markerStyle}>{marker}</span>
       <span className="min-w-0 flex-1">{text}</span>
       <button
+        data-html2canvas-ignore="true"
         onMouseDown={(e) => e.preventDefault()}
         onClick={startEdit}
         title="Edit bullet"
@@ -144,6 +156,7 @@ export function AddBulletButton({ expId, label = 'Add bullet', className }) {
   if (!ctx.enabled) return null
   return (
     <button
+      data-html2canvas-ignore="true"
       onClick={() => ctx.addBullet(expId)}
       className={cn(
         'mt-1 flex items-center gap-1.5 rounded border border-dashed border-black/20 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-black/35 transition-colors hover:border-cyan-600/70 hover:bg-cyan-500/10 hover:text-cyan-700 dark:border-white/25 dark:text-white/40 dark:hover:text-cyan-200',

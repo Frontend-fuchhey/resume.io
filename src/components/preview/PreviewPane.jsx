@@ -37,7 +37,7 @@ const OUTLINE_MAP = {
   accent: 'border-2 border-[#FF5E1A]/50',
 }
 
-export function PreviewPane() {
+export function PreviewPane({ onDownload, isDownloading }) {
   const resume = useResumeStore()
   const templateId = resume.templateId || 'ats-studio'
   const formatting = resume.formatting || {}
@@ -113,6 +113,8 @@ export function PreviewPane() {
           zoom={zoomSetting}
           onZoomChange={(val) => setZoomSetting(val)}
           zoomOptions={['32%', '50%', '75%', '100%', 'Fit']}
+          onDownload={onDownload}
+          isDownloading={isDownloading}
         />
       </div>
 
@@ -147,17 +149,20 @@ export function PreviewPane() {
               }}
             >
               <div
+                id="resume-canvas"
                 ref={innerRef}
                 className={`relative mx-auto bg-white ${shadowClass} ${shapeClass} ${outlineClass}`}
                 style={{
                   width: pageWidth,
                   minHeight: pageMinHeight,
+                  color: formatting.accentColor || '#244CEC',
                 }}
               >
                 {/* Page Break Boundaries Visualizer */}
                 {pageBreaks.map((breakY, idx) => (
                   <div
                     key={idx}
+                    data-html2canvas-ignore="true"
                     className="pointer-events-none absolute left-0 right-0 z-30 flex items-center select-none"
                     style={{ top: breakY }}
                   >
@@ -169,7 +174,7 @@ export function PreviewPane() {
                   </div>
                 ))}
 
-                <Template resume={resume} />
+                <Template resume={resume} theme={{ accentColor: formatting.accentColor || '#244CEC' }} />
               </div>
             </div>
           </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { ArrowLeft, FileText, Layers, PenTool, UserCircle2 } from 'lucide-react'
-import { Brand } from '../brand'
+import logoImg from '../../assets/resume-logo.png'
 import { ResumeEditor } from './ResumeEditor'
 import { TemplateGallery } from './TemplateGallery'
 import { PreviewPane } from '../preview/PreviewPane'
@@ -10,9 +10,12 @@ import { toast } from '../../store/useUIStore'
 import { exportResumePdf } from '../../pdf/exportPdf'
 import { resumeFilename } from '../../lib/names'
 import { AboutCreatorModal } from '../AboutCreatorModal'
-import { AtsScoreBadge } from './ats'
 
 export function EditorScreen({ onHome }) {
+  const navigate = (path = '/') => {
+    if (onHome) onHome()
+    else window.location.href = path
+  }
   const resume = useResumeStore()
   const [leftTab, setLeftTab] = useState('create') // 'create' | 'templates'
   const [busy, setBusy] = useState(false)
@@ -27,8 +30,13 @@ export function EditorScreen({ onHome }) {
     if (busy) return
     setBusy(true)
     try {
+      if (mobilePane !== 'canvas') {
+        setMobilePane('canvas')
+      }
+      // Micro-delay (~100-200ms) ensuring DOM repaint and state transitions finish
+      await new Promise((resolve) => setTimeout(resolve, 150))
       const filename = await exportResumePdf(resume)
-      toast(`Downloaded vector ATS resume: ${filename}`)
+      toast(`Downloaded ATS resume: ${filename}`)
     } catch (err) {
       console.error(err)
       toast('PDF export failed — please try again', 'error')
@@ -58,7 +66,12 @@ export function EditorScreen({ onHome }) {
             >
               <ArrowLeft size={16} />
             </button>
-            <Brand size={26} withText={false} />
+            <img 
+              src={logoImg} 
+              alt="resume.io" 
+              className="h-7 w-auto object-contain cursor-pointer" 
+              onClick={() => navigate('/')} 
+            />
             <div className="min-w-0 max-w-[180px]">
               <div className="flex items-center gap-1.5 text-xs font-bold text-[#1A1A1A]">
                 <FileText size={12} className="shrink-0 text-[#FF5E1A]" />
@@ -71,9 +84,6 @@ export function EditorScreen({ onHome }) {
           </div>
 
           <div className="flex items-center gap-2">
-            {/* Live ATS Score Badge */}
-            <AtsScoreBadge />
-
             {/* ── About Creator button ── */}
             <button
               type="button"
@@ -132,7 +142,7 @@ export function EditorScreen({ onHome }) {
           mobilePane === 'canvas' ? 'flex' : 'hidden lg:flex'
         }`}
       >
-        <PreviewPane />
+        <PreviewPane onDownload={handleDownload} isDownloading={busy} />
       </main>
 
       {/* ========================================================================= */}

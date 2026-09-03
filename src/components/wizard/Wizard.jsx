@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Briefcase, FileText, Globe, GraduationCap, Heart, LayoutTemplate, Tag } from 'lucide-react'
-import { Brand } from '../brand'
+import resumeIoLogo from '@/assets/resume-io.png'
 import { Button } from '../ui/primitives'
 import { toast } from '../../store/useUIStore'
 import { useResumeStore } from '../../store/useResumeStore'
@@ -37,6 +37,8 @@ export function Wizard({ onFinish, onExit }) {
 
   const step = STEPS[idx]
   const StepIcon = step.icon
+  const currentStep = idx + 1
+  const totalSteps = STEPS.length
 
   const next = () => {
     if (idx === 0) {
@@ -68,17 +70,13 @@ export function Wizard({ onFinish, onExit }) {
     <div className="flex min-h-screen flex-col bg-[#FBF9F5] text-[#1A1A1A]">
       {/* Top bar */}
       <header className="mx-auto flex w-full max-w-4xl items-center gap-3 px-5 py-5">
-        <button onClick={onExit} className="text-sm font-semibold transition-colors hover:text-[#FF5E1A]" aria-label="Leave wizard">
-          <Brand size={28} withText={false} />
+        <button onClick={onExit} className="text-sm font-semibold transition-opacity hover:opacity-80" aria-label="Leave wizard">
+          <img
+            src={resumeIoLogo}
+            alt="resume.io"
+            className="h-8 w-auto object-contain"
+          />
         </button>
-        <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-bold text-[#1A1A1A]">
-            {step.label}
-          </p>
-          <p className="truncate text-xs text-[#666055]">
-            Step {idx + 1} of {STEPS.length}
-          </p>
-        </div>
       </header>
 
       {/* Progress pills */}
@@ -114,14 +112,23 @@ export function Wizard({ onFinish, onExit }) {
       {/* Form card */}
       <div className="mx-auto w-full max-w-3xl flex-1 px-4 pb-28 pt-6">
         <div className="rounded-2xl border border-[#E8E4DC] bg-white p-5 shadow-card sm:p-8">
-          <div className="mb-6 flex items-start gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#FFF3EB] text-[#FF5E1A] border border-[#FF5E1A]/20">
-              <StepIcon size={20} />
-            </span>
-            <div>
-              <h2 className="text-xl font-bold tracking-tight text-[#1A1A1A]">{step.label}</h2>
-              <p className="mt-0.5 text-xs text-[#666055]">{step.blurb}</p>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2.5 bg-orange-50 rounded-xl text-[#FF5E1A]">
+                <StepIcon size={20} />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">{step.label}</h2>
+                <p className="text-xs text-gray-500">
+                  {step.blurb}
+                </p>
+              </div>
             </div>
+
+            {/* Relocated Step Badge */}
+            <span className="text-xs font-semibold px-3 py-1 bg-gray-100 text-gray-600 rounded-full border border-gray-200">
+              Step {currentStep} of {totalSteps}
+            </span>
           </div>
 
           {attempted && idx === 0 && errors.length > 0 && (

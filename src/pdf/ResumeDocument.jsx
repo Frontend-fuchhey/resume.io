@@ -748,7 +748,11 @@ function AtsStudioDoc({ data, t }) {
 const BUILDERS = { 'ats-studio': AtsStudioDoc, classic: ClassicDoc, cyber: CyberDoc, tech: TechDoc, exec: ExecDoc }
 
 export function ResumeDocument({ resume }) {
-  const theme = PDF_THEMES[resume.templateId] || PDF_THEMES['ats-studio'] || PDF_THEMES.classic
+  const baseTheme = PDF_THEMES[resume.templateId] || PDF_THEMES['ats-studio'] || PDF_THEMES.classic
+  const theme = {
+    ...baseTheme,
+    ...(resume.formatting?.accentColor ? { accent: resume.formatting.accentColor } : {}),
+  }
   const Builder = BUILDERS[theme.id] || AtsStudioDoc || ClassicDoc
   return (
     <Document title={`${resume.basic.fullName || 'Resume'} — Resume`} producer="resume.io ATS Studio" creator="resume.io">

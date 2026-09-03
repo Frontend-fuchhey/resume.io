@@ -29,7 +29,7 @@ const PADDING_MAP = {
   spacious: '52px 56px',
 }
 
-export default function AtsStudioTemplate({ resume }) {
+export default function AtsStudioTemplate({ resume, theme }) {
   const basic = resume.basic || {}
   const experience = resume.experience || []
   const education = resume.education || []
@@ -51,7 +51,7 @@ export default function AtsStudioTemplate({ resume }) {
   const titleFontFamily = formatting.fontFamily === 'Courgette' ? "'Courgette', cursive" : fontFamily
   const fontWeight = formatting.fontWeight || '400'
   const baseFontSize = formatting.fontSize || 10.5
-  const accentColor = formatting.accentColor || '#244CEC'
+  const accentColor = theme?.accentColor || formatting.accentColor || '#244CEC'
   const textColor = formatting.textColor || '#1A1A1A'
   const textAlign = formatting.textAlign || 'left'
   const lineHeight = (formatting.lineHeight || 140) / 100
@@ -70,11 +70,12 @@ export default function AtsStudioTemplate({ resume }) {
   const renderContactAndWebsites = () => (
     <section key="websites" className="resume-block">
       <h2
-        className="text-[10pt] font-bold uppercase tracking-wider pb-1.5 mb-2.5 border-b"
-        style={{ color: accentColor, borderColor: `${accentColor}40` }}
+        className="text-[10pt] font-bold uppercase tracking-wider"
+        style={{ color: accentColor }}
       >
         Contact Details
       </h2>
+      <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-1.5 opacity-40" />
       <div className="space-y-2 text-[9pt] text-[#403D39]">
         {(basic.email || basic.email === '') && (
           <div className="flex items-center gap-2">
@@ -119,7 +120,8 @@ export default function AtsStudioTemplate({ resume }) {
                   href={toHref(w.url)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-[#666055] hover:text-[#FF5E1A] hover:underline transition-colors font-mono text-[8.5pt]"
+                  className="hover:underline transition-colors font-mono text-[8.5pt]"
+                  style={{ color: accentColor }}
                   title={w.url}
                 >
                   {cleanUrl(w.url)}
@@ -137,11 +139,12 @@ export default function AtsStudioTemplate({ resume }) {
   const renderEducation = () => (
     <section key="education" className="resume-block">
       <h2
-        className="text-[10pt] font-bold uppercase tracking-wider pb-1.5 mb-2.5 border-b"
-        style={{ color: accentColor, borderColor: `${accentColor}40` }}
+        className="text-[10pt] font-bold uppercase tracking-wider"
+        style={{ color: accentColor }}
       >
         Education
       </h2>
+      <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-1.5 opacity-40" />
       <div className="space-y-3">
         {education.map((edu) => (
           <div
@@ -189,11 +192,12 @@ export default function AtsStudioTemplate({ resume }) {
   const renderSkills = () => (
     <section key="skills" className="resume-block">
       <h2
-        className="text-[10pt] font-bold uppercase tracking-wider pb-1.5 mb-2.5 border-b"
-        style={{ color: accentColor, borderColor: `${accentColor}40` }}
+        className="text-[10pt] font-bold uppercase tracking-wider"
+        style={{ color: accentColor }}
       >
         Skills & Competencies
       </h2>
+      <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-1.5 opacity-40" />
       <div className="space-y-2.5">
         {skillGroups.map((g) => (
           <div key={g.id} className="resume-block">
@@ -225,11 +229,12 @@ export default function AtsStudioTemplate({ resume }) {
   const renderHobbies = () => (
     <section key="hobbies" className="resume-block">
       <h2
-        className="text-[10pt] font-bold uppercase tracking-wider pb-1.5 mb-2.5 border-b"
-        style={{ color: accentColor, borderColor: `${accentColor}40` }}
+        className="text-[10pt] font-bold uppercase tracking-wider"
+        style={{ color: accentColor }}
       >
         Hobbies & Interests
       </h2>
+      <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-1.5 opacity-40" />
       <div className="flex flex-wrap gap-1.5">
         {hobbies.map((h) => (
           <span
@@ -251,11 +256,12 @@ export default function AtsStudioTemplate({ resume }) {
   const renderSummary = () => (
     <section key="summary" className="resume-block">
       <h2
-        className="text-[11pt] font-bold uppercase tracking-wider pb-1.5 mb-2 border-b"
-        style={{ color: accentColor, borderColor: `${accentColor}40` }}
+        className="text-[11pt] font-bold uppercase tracking-wider"
+        style={{ color: accentColor }}
       >
         Profile Summary
       </h2>
+      <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-1.5 opacity-40" />
       <div className="text-[9.5pt] text-[#2D2D2D] leading-relaxed text-justify">
         <EditableText
           multiline
@@ -271,11 +277,12 @@ export default function AtsStudioTemplate({ resume }) {
   const renderExperience = () => (
     <section key="experience" className="resume-block">
       <h2
-        className="text-[11pt] font-bold uppercase tracking-wider pb-1.5 mb-3.5 border-b"
-        style={{ color: accentColor, borderColor: `${accentColor}40` }}
+        className="text-[11pt] font-bold uppercase tracking-wider"
+        style={{ color: accentColor }}
       >
         Employment History
       </h2>
+      <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-2 opacity-40" />
 
       <div className="relative pl-4 space-y-5 before:absolute before:left-1 before:top-2 before:bottom-2 before:w-[2px] before:bg-[#E8E4DC]">
         {experience.map((exp) => (
@@ -325,7 +332,7 @@ export default function AtsStudioTemplate({ resume }) {
               <ul className="mt-2 space-y-1 text-[9pt] text-[#2D2D2D]">
                 {exp.bullets.map((bullet, idx) => (
                   <li key={idx} className="resume-block flex items-start gap-1.5 leading-snug">
-                    <span className="mt-1 text-[8pt] text-[#666055] select-none shrink-0">•</span>
+                    <span className="mt-1 text-[8pt] select-none shrink-0" style={{ color: accentColor }}>•</span>
                     <EditableText
                       multiline
                       value={bullet}
@@ -421,6 +428,7 @@ export default function AtsStudioTemplate({ resume }) {
           </p>
         </div>
       </header>
+      <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full mt-4 mb-2 opacity-30" />
 
       {/* Two-Column Dynamic ATS Grid */}
       <div className="mt-6 grid grid-cols-12 gap-8 items-start">
