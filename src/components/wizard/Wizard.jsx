@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Briefcase, FileText, Globe, GraduationCap, Heart, LayoutTemplate, Tag } from 'lucide-react'
+import { Briefcase, FileText, FolderGit2, Globe, GraduationCap, Heart, LayoutTemplate, Tag } from 'lucide-react'
 import resumeIoLogo from '@/assets/resume-io.png'
 import { Button } from '../ui/primitives'
 import { toast } from '../../store/useUIStore'
@@ -9,6 +9,7 @@ import { BasicForm, EMAIL_RE } from '../forms/BasicForm'
 import { SummaryForm } from '../forms/SummaryForm'
 import { ExperienceManager } from '../forms/ExperienceManager'
 import { EducationManager } from '../forms/EducationManager'
+import { ProjectsManager } from '../forms/ProjectsManager'
 import { WebsitesManager } from '../forms/WebsitesManager'
 import { SkillsManager } from '../forms/SkillsManager'
 import { HobbiesManager } from '../forms/HobbiesManager'
@@ -20,6 +21,7 @@ const STEPS = [
   { id: 'summary', label: 'Summary', icon: FileText, blurb: 'Brief executive bio highlighting your domain and strongest achievements.' },
   { id: 'experience', label: 'Experience', icon: Briefcase, blurb: 'Chronological roles and key milestones.' },
   { id: 'education', label: 'Education', icon: GraduationCap, blurb: 'Degrees, schools and graduation credentials.' },
+  { id: 'projects', label: 'Projects', icon: FolderGit2, blurb: 'Key initiatives, portfolio highlights, campaigns, and accomplishments.' },
   { id: 'websites', label: 'Social & Links', icon: Globe, blurb: 'Portfolio, LinkedIn, GitHub and online profiles.' },
   { id: 'skills', label: 'Skills', icon: Tag, blurb: 'Categorized keywords recruiters and ATS screeners target.' },
   { id: 'hobbies', label: 'Hobbies', icon: Heart, blurb: 'Personal passions and activities.' },
@@ -147,7 +149,7 @@ export function Wizard({ onFinish, onExit }) {
               exit={{ opacity: 0, x: -24 }}
               transition={{ duration: 0.2, ease: 'easeOut' }}
             >
-              <StepBody idx={idx} />
+              <StepBody stepId={step.id} />
             </motion.div>
           </AnimatePresence>
         </div>
@@ -174,13 +176,14 @@ export function Wizard({ onFinish, onExit }) {
   )
 }
 
-function StepBody({ idx }) {
-  if (idx === 0) return <BasicForm />
-  if (idx === 1) return <SummaryForm />
-  if (idx === 2) return <ExperienceManager />
-  if (idx === 3) return <EducationManager />
-  if (idx === 4) return <WebsitesManager />
-  if (idx === 5) return <SkillsManager />
-  if (idx === 6) return <HobbiesManager />
+function StepBody({ stepId }) {
+  if (stepId === 'basic') return <BasicForm />
+  if (stepId === 'summary') return <SummaryForm />
+  if (stepId === 'experience') return <ExperienceManager />
+  if (stepId === 'education') return <EducationManager />
+  if (stepId === 'projects') return <ProjectsManager />
+  if (stepId === 'websites') return <WebsitesManager />
+  if (stepId === 'skills') return <SkillsManager />
+  if (stepId === 'hobbies') return <HobbiesManager />
   return <TemplateGrid />
 }

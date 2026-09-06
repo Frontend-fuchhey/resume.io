@@ -95,23 +95,32 @@ export default function ExecutiveTemplate({ resume, theme }) {
         </section>
       )}
 
-      {visibility.projects && projects.some((p) => p.name || p.description) && (
-        <section>
+      {visibility.projects && projects.some((p) => p.title || p.name || p.description) && (
+        <section className="resume-block">
           <Head accent={accent}>Selected Projects</Head>
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {projects
-              .filter((p) => p.name || p.description)
+              .filter((p) => p.title || p.name || p.description)
               .map((p) => (
-                <div key={p.id} className="break-inside-avoid">
-                  <p className="text-[11px] font-bold" style={{ fontFamily: SERIF }}>
-                    {p.name}
+                <div key={p.id} className="break-inside-avoid resume-block">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <p className="text-[11px] font-bold" style={{ fontFamily: SERIF }}>
+                      {p.title || p.name}
+                    </p>
                     {p.link && (
-                      <span className="ml-1 font-normal normal-case tracking-normal" style={{ color: accent }}>
+                      <span className="font-mono text-[9px] font-medium" style={{ color: accent }}>
                         {p.link}
                       </span>
                     )}
-                  </p>
-                  {p.description && <p className="text-justify">{p.description}</p>}
+                  </div>
+                  {p.techStack && (
+                    <p className="text-[9.2px] font-semibold" style={{ color: accent }}>
+                      {p.techStack}
+                    </p>
+                  )}
+                  {p.description && (
+                    <p className="text-justify text-[9.6px] whitespace-pre-line leading-relaxed">{p.description}</p>
+                  )}
                 </div>
               ))}
           </div>

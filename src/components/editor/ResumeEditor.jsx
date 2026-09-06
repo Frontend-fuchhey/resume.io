@@ -4,6 +4,7 @@ import {
   ChevronDown,
   ChevronUp,
   FileText,
+  FolderGit2,
   Globe,
   GraduationCap,
   GripVertical,
@@ -14,6 +15,7 @@ import {
 import { BasicForm } from '../forms/BasicForm'
 import { SummaryForm } from '../forms/SummaryForm'
 import { ExperienceManager } from '../forms/ExperienceManager'
+import { ProjectsManager } from '../forms/ProjectsManager'
 import { EducationManager } from '../forms/EducationManager'
 import { WebsitesManager } from '../forms/WebsitesManager'
 import { SkillsManager } from '../forms/SkillsManager'
@@ -45,6 +47,14 @@ const SECTION_CONFIGS = {
     subtitle: 'Academic credentials, schools & achievements',
     defaultOpen: false,
     Component: EducationManager,
+    hasVisibility: true,
+  },
+  projects: {
+    icon: FolderGit2,
+    title: 'Projects',
+    subtitle: 'Key initiatives, portfolio highlights & accomplishments',
+    defaultOpen: false,
+    Component: ProjectsManager,
     hasVisibility: true,
   },
   websites: {
@@ -158,10 +168,24 @@ export function ResumeEditor() {
 
   // Ensure all configured keys exist in the list
   const validKeys = Object.keys(SECTION_CONFIGS)
-  const activeOrder = [
+  let activeOrder = [
     ...sectionOrder.filter((k) => validKeys.includes(k)),
     ...validKeys.filter((k) => !sectionOrder.includes(k)),
   ]
+
+  // If projects is buried below hobbies in legacy saved state, elevate it right after education
+  const hobIdx = activeOrder.indexOf('hobbies')
+  const projIdx = activeOrder.indexOf('projects')
+  const eduIdx = activeOrder.indexOf('education')
+  if (projIdx > hobIdx && hobIdx !== -1) {
+    activeOrder = activeOrder.filter((k) => k !== 'projects')
+    const insertAfter = eduIdx !== -1 ? activeOrder.indexOf('education') : -1
+    if (insertAfter !== -1) {
+      activeOrder.splice(insertAfter + 1, 0, 'projects')
+    } else {
+      activeOrder.unshift('projects')
+    }
+  }
 
   return (
     <div className="flex flex-col gap-2.5 pb-8">

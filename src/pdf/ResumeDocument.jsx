@@ -115,17 +115,18 @@ function ClassicDoc({ data, t }) {
         </>
       )}
 
-      {visibility.projects && projects.some((p) => clean(p.name) || clean(p.description)) && (
+      {visibility.projects && projects.some((p) => clean(p.title || p.name) || clean(p.description)) && (
         <>
           <SectionTitle label="Projects" underline="accent" />
           {projects
-            .filter((p) => clean(p.name) || clean(p.description))
+            .filter((p) => clean(p.title || p.name) || clean(p.description))
             .map((p) => (
               <View key={p.id} style={{ marginBottom: 5, marginTop: 1 }}>
                 <Text style={{ ...th.bold, fontSize: 10 }}>
-                  {clean(p.name)}
+                  {clean(p.title || p.name)}
                   {clean(p.link) && <Text style={{ color: '#1d4ed8', fontFamily: th.bodyFont }}>  {p.link}</Text>}
                 </Text>
+                {clean(p.techStack) && <Text style={{ ...th.sm, color: th.accent }}>{clean(p.techStack)}</Text>}
                 {clean(p.description) && <Text style={th.body}>{p.description}</Text>}
               </View>
             ))}
@@ -244,17 +245,18 @@ function CyberDoc({ data, t }) {
           </>
         )}
 
-        {visibility.projects && projects.some((p) => clean(p.name) || clean(p.description)) && (
+        {visibility.projects && projects.some((p) => clean(p.title || p.name) || clean(p.description)) && (
           <>
             <SectionTitle label="Projects" underline="accent" />
             {projects
-              .filter((p) => clean(p.name) || clean(p.description))
+              .filter((p) => clean(p.title || p.name) || clean(p.description))
               .map((p) => (
                 <View key={p.id} style={{ marginBottom: 5 }}>
                   <Text style={{ ...th.bold, fontSize: 10 }}>
-                    {clean(p.name)}
+                    {clean(p.title || p.name)}
                     {clean(p.link) && <Text style={{ color: th.accent, fontFamily: th.bodyFont }}>  {p.link}</Text>}
                   </Text>
+                  {clean(p.techStack) && <Text style={{ ...th.sm, color: th.accent }}>{clean(p.techStack)}</Text>}
                   {clean(p.description) && <Text style={th.body}>{p.description}</Text>}
                 </View>
               ))}
@@ -366,17 +368,18 @@ function TechDoc({ data, t }) {
             </>
           )}
 
-          {visibility.projects && projects.some((p) => clean(p.name) || clean(p.description)) && (
+          {visibility.projects && projects.some((p) => clean(p.title || p.name) || clean(p.description)) && (
             <>
               <SectionTitleTech label="Projects" />
               {projects
-                .filter((p) => clean(p.name) || clean(p.description))
+                .filter((p) => clean(p.title || p.name) || clean(p.description))
                 .map((p) => (
                   <View key={p.id} style={{ marginBottom: 4 }}>
                     <Text style={{ ...th.bold, fontSize: 9.4 }}>
-                      {clean(p.name)}
+                      {clean(p.title || p.name)}
                       {clean(p.link) && <Text style={{ color: '#1d4ed8', fontFamily: th.bodyFont, fontSize: 8 }}>  {p.link}</Text>}
                     </Text>
+                    {clean(p.techStack) && <Text style={{ ...th.sm, fontSize: 7.6, color: th.accent }}>{clean(p.techStack)}</Text>}
                     {clean(p.description) && <Text style={{ ...th.body, fontSize: th.bodySize - 0.2 }}>{p.description}</Text>}
                   </View>
                 ))}
@@ -525,17 +528,18 @@ function ExecDoc({ data, t }) {
         </>
       )}
 
-      {visibility.projects && projects.some((p) => clean(p.name) || clean(p.description)) && (
+      {visibility.projects && projects.some((p) => clean(p.title || p.name) || clean(p.description)) && (
         <>
           <SectionTitle label="Selected Projects" centered />
           {projects
-            .filter((p) => clean(p.name) || clean(p.description))
+            .filter((p) => clean(p.title || p.name) || clean(p.description))
             .map((p) => (
               <View key={p.id} style={{ marginBottom: 5 }}>
                 <Text style={{ ...th.bold, fontSize: 10.4 }}>
-                  {clean(p.name)}
+                  {clean(p.title || p.name)}
                   {clean(p.link) && <Text style={{ color: '#1d4ed8', fontFamily: th.bodyFont, fontSize: 8.4 }}>  {p.link}</Text>}
                 </Text>
+                {clean(p.techStack) && <Text style={{ ...th.sm, fontSize: 7.8, color: th.accent }}>{clean(p.techStack)}</Text>}
                 {clean(p.description) && <Text style={th.body}>{p.description}</Text>}
               </View>
             ))}
@@ -600,7 +604,7 @@ function ExecDoc({ data, t }) {
 /*  ATS Studio Two-Column                                             */
 /* ------------------------------------------------------------------ */
 function AtsStudioDoc({ data, t }) {
-  const { basic, experience, education, websites = [], skillGroups, hobbies = [], visibility = {}, formatting = {} } = data
+  const { basic, experience, education, websites = [], skillGroups, hobbies = [], projects = [], visibility = {}, formatting = {} } = data
   const accent = formatting.accentColor || t.accent || '#244CEC'
   const isLetter = formatting.canvasDimensions === 'Letter'
   const pageSize = isLetter ? { width: 612, height: 792 } : A4
@@ -733,6 +737,33 @@ function AtsStudioDoc({ data, t }) {
                       {'\u2022  '}{b}
                     </Text>
                   ))}
+                </View>
+              ))}
+            </View>
+          )}
+
+          {/* Projects */}
+          {visibility.projects !== false && projects.some((p) => clean(p.title || p.name) || clean(p.description)) && (
+            <View style={{ marginTop: 10 }}>
+              <Text style={{ fontSize: 9, fontFamily: 'Helvetica-Bold', color: accent, textTransform: 'uppercase', letterSpacing: 1, marginBottom: 5, paddingBottom: 2, borderBottomWidth: 1, borderBottomColor: `${accent}30` }}>
+                Projects
+              </Text>
+              {projects.filter((p) => clean(p.title || p.name) || clean(p.description)).map((proj) => (
+                <View key={proj.id} style={{ marginBottom: 7 }}>
+                  <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                    <Text style={{ fontSize: 8.8, fontFamily: 'Helvetica-Bold', color: '#1A1A1A' }}>{clean(proj.title || proj.name) || 'Project'}</Text>
+                    {clean(proj.link) && <Text style={{ fontSize: 7.4, color: accent }}>{clean(proj.link)}</Text>}
+                  </View>
+                  {clean(proj.techStack) && (
+                    <Text style={{ fontSize: 7.8, fontFamily: 'Helvetica-Bold', color: accent, marginTop: 1 }}>
+                      {clean(proj.techStack)}
+                    </Text>
+                  )}
+                  {clean(proj.description) && (
+                    <Text style={{ fontSize: 7.8, color: '#2D2D2D', lineHeight: 1.4, marginTop: 1.5 }}>
+                      {proj.description}
+                    </Text>
+                  )}
                 </View>
               ))}
             </View>

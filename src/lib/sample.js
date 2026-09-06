@@ -65,6 +65,26 @@ export function sampleData() {
         focus: 'Minor in Mathematics · Dean’s List (4 terms)',
       },
     ],
+    projects: [
+      {
+        id: 'prj1',
+        title: 'atlas-ui — open-source component library',
+        name: 'atlas-ui — open-source component library',
+        techStack: 'React, TypeScript, Tailwind CSS, Storybook',
+        link: 'github.com/alexmorgan/atlas-ui',
+        description:
+          'Accessible React component library (1.4k GitHub stars). Ships with full a11y coverage, dark mode tokens and a CLI scaffold generator.',
+      },
+      {
+        id: 'prj2',
+        title: 'Nomad Salary Explorer',
+        name: 'Nomad Salary Explorer',
+        techStack: 'Next.js, Python, PostgreSQL, Mapbox GL',
+        link: 'nomadsalaries.dev',
+        description:
+          'Interactive map comparing cost-of-living and tech salaries across 60+ cities; averages 12k monthly sessions.',
+      },
+    ],
     websites: [
       { id: 'w1', label: 'Portfolio', url: 'alexmorgan.dev' },
       { id: 'w2', label: 'GitHub', url: 'github.com/alexmorgan' },
@@ -79,22 +99,6 @@ export function sampleData() {
       { id: 'h1', name: 'Open-Source Maintainer' },
       { id: 'h2', name: 'Marathon Running' },
       { id: 'h3', name: 'Specialty Coffee Brewing' },
-    ],
-    projects: [
-      {
-        id: 'prj1',
-        name: 'atlas-ui — open-source component library',
-        link: 'github.com/alexmorgan/atlas-ui',
-        description:
-          'Accessible React component library (1.4k GitHub stars). Ships with full a11y coverage, dark mode tokens and a CLI scaffold generator.',
-      },
-      {
-        id: 'prj2',
-        name: 'Nomad Salary Explorer',
-        link: 'nomadsalaries.dev',
-        description:
-          'Interactive map comparing cost-of-living and tech salaries across 60+ cities; averages 12k monthly sessions.',
-      },
     ],
     certifications: [
       { id: 'cer1', name: 'AWS Certified Developer — Associate', issuer: 'Amazon Web Services', year: '2024' },

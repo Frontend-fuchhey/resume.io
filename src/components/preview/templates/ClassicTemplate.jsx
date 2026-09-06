@@ -110,23 +110,32 @@ export default function ClassicTemplate({ resume, theme }) {
         </section>
       )}
 
-      {visibility.projects && projects.some((p) => p.name || p.description) && (
-        <section>
+      {visibility.projects && projects.some((p) => p.title || p.name || p.description) && (
+        <section className="resume-block">
           <Head title="Projects" accent={accentColor} />
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {projects
-              .filter((p) => p.name || p.description)
+              .filter((p) => p.title || p.name || p.description)
               .map((p) => (
-                <div key={p.id} className="break-inside-avoid">
-                  <p className="text-[10.8px] font-bold">
-                    {p.name}
+                <div key={p.id} className="break-inside-avoid resume-block">
+                  <div className="flex items-baseline justify-between gap-2">
+                    <p className="text-[10.8px] font-bold">
+                      {p.title || p.name}
+                    </p>
                     {p.link && (
-                      <span className="ml-1.5 font-medium normal-case tracking-normal" style={{ color: accentColor }}>
+                      <span className="font-mono text-[9px] font-medium" style={{ color: accentColor }}>
                         {p.link}
                       </span>
                     )}
-                  </p>
-                  {p.description && <p className="text-justify">{p.description}</p>}
+                  </div>
+                  {p.techStack && (
+                    <p className="text-[9.2px] font-semibold tracking-wide" style={{ color: accentColor }}>
+                      {p.techStack}
+                    </p>
+                  )}
+                  {p.description && (
+                    <p className="mt-0.5 text-justify whitespace-pre-line leading-relaxed">{p.description}</p>
+                  )}
                 </div>
               ))}
           </div>

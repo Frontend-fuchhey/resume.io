@@ -16,29 +16,7 @@ function useListApi(list) {
   }
 }
 
-export function ProjectsManager() {
-  const { items, add, update, remove, move, reorder } = useListApi('projects')
-  return (
-    <Collection
-      items={items}
-      reorder={reorder}
-      onAdd={add}
-      empty="No projects yet — add open-source work, side products or case studies."
-      addLabel="Add project"
-      renderItem={(item, index, total) => (
-        <ProjectRow
-          key={item.id}
-          item={item}
-          index={index}
-          total={total}
-          onPatch={(patch) => update(item.id, patch)}
-          onRemove={() => remove(item.id)}
-          onMove={(dir) => move(item.id, dir)}
-        />
-      )}
-    />
-  )
-}
+export { ProjectsManager } from './ProjectsManager'
 
 export function CertsManager() {
   const { items, add, update, remove, move, reorder } = useListApi('certifications')
@@ -71,16 +49,16 @@ function ProjectRow({ item, index, total, onPatch, onRemove, onMove }) {
   return (
     <RowShell controls={controls} index={index} total={total} onMove={onMove} onRemove={onRemove} item={item}>
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
-        <Field label="Project name">
-          <TextInput value={item.name} onChange={(e) => onPatch({ name: e.target.value })} placeholder="Open-source dashboard" compact />
+        <Field label="Project Title">
+          <TextInput value={item.name} onChange={(e) => onPatch({ name: e.target.value })} placeholder="e.g. Marketing Campaign, Brand Redesign, E-commerce Website, Research Study" compact />
         </Field>
-        <Field label="Link / URL">
-          <TextInput value={item.link} onChange={(e) => onPatch({ link: e.target.value })} placeholder="github.com/you/repo" compact />
+        <Field label="Project / Portfolio Link">
+          <TextInput value={item.link} onChange={(e) => onPatch({ link: e.target.value })} placeholder="e.g. link-to-project.com, drive/folder, behance.net/design" compact />
         </Field>
       </div>
       <div className="mt-2">
-        <Field label="What did you build or learn?">
-          <TextArea value={item.description} onChange={(e) => onPatch({ description: e.target.value })} rows={2} placeholder="One or two crisp sentences with a metric if possible…" compact />
+        <Field label="Description">
+          <TextArea value={item.description} onChange={(e) => onPatch({ description: e.target.value })} rows={2} placeholder="e.g. Led cross-functional team, designed marketing assets, increased traffic by 30%, or published research findings..." compact />
         </Field>
       </div>
     </RowShell>

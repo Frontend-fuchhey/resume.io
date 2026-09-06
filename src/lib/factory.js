@@ -38,7 +38,7 @@ export function freshHobby() {
 }
 
 export function freshProject() {
-  return { id: uid(), name: '', link: '', description: '' }
+  return { id: uid(), title: '', name: '', techStack: '', description: '', link: '' }
 }
 
 export function freshCertification() {
@@ -64,7 +64,7 @@ export function freshFormatting() {
 }
 
 export function defaultSectionOrder() {
-  return ['summary', 'experience', 'education', 'websites', 'skills', 'hobbies']
+  return ['summary', 'experience', 'education', 'projects', 'websites', 'skills', 'hobbies']
 }
 
 export function blankVisibility() {

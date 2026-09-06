@@ -70,6 +70,9 @@ export async function exportToPdf(resumeData) {
           clonedCanvas.style.color = theme.accentColor
           clonedCanvas.style.boxShadow = 'none'
           clonedCanvas.style.transform = 'none'
+          clonedCanvas.style.height = 'auto'
+          clonedCanvas.style.maxHeight = 'none'
+          clonedCanvas.style.overflow = 'visible'
         }
         // Remove interactive editor artifacts (page-break guides, add bullet buttons)
         clonedDoc.querySelectorAll('[data-html2canvas-ignore="true"]').forEach((el) => {
@@ -77,7 +80,15 @@ export async function exportToPdf(resumeData) {
         })
       },
     },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
+    pagebreak: {
+      mode: ['avoid-all', 'css', 'legacy'],
+      avoid: ['.resume-block', '.break-inside-avoid', 'section', '.resume-card'],
+    },
+    jsPDF: {
+      unit: 'mm',
+      format: (data.formatting?.canvasDimensions === 'Letter' ? 'letter' : 'a4'),
+      orientation: 'portrait',
+    },
   }
 
   await html2pdf().set(opt).from(canvasEl).save()

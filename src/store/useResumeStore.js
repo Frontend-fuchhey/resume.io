@@ -136,7 +136,15 @@ export const useResumeStore = create(
       },
 
       updateItem: (list, id, patch) => {
-        set((s) => ({ [list]: patchItem(s[list] || [], id, patch) }))
+        let finalPatch = patch
+        if (list === 'projects') {
+          if (patch.title !== undefined && patch.name === undefined) {
+            finalPatch = { ...patch, name: patch.title }
+          } else if (patch.name !== undefined && patch.title === undefined) {
+            finalPatch = { ...patch, title: patch.name }
+          }
+        }
+        set((s) => ({ [list]: patchItem(s[list] || [], id, finalPatch) }))
       },
 
       removeItem: (list, id) => {
@@ -286,4 +294,4 @@ export const useResumeStore = create(
 )
 
 export const hasResumeData = (state) =>
-  Boolean(state.basic.fullName.trim() || state.experience?.length || state.education?.length)
+  Boolean(state.basic.fullName.trim() || state.experience?.length || state.education?.length || state.projects?.length)

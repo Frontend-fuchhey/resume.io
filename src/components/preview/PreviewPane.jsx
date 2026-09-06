@@ -27,8 +27,8 @@ const SHADOW_MAP = {
 
 const SHAPE_MAP = {
   sharp: 'rounded-none',
-  rounded: 'rounded-lg overflow-hidden',
-  smooth: 'rounded-2xl overflow-hidden',
+  rounded: 'rounded-lg',
+  smooth: 'rounded-2xl',
 }
 
 const OUTLINE_MAP = {
@@ -151,10 +151,12 @@ export function PreviewPane({ onDownload, isDownloading }) {
               <div
                 id="resume-canvas"
                 ref={innerRef}
-                className={`relative mx-auto bg-white ${shadowClass} ${shapeClass} ${outlineClass}`}
+                className={`resume-printable-area relative mx-auto bg-white ${shadowClass} ${shapeClass} ${outlineClass}`}
                 style={{
                   width: pageWidth,
                   minHeight: pageMinHeight,
+                  height: 'auto',
+                  overflow: 'visible',
                   color: formatting.accentColor || '#244CEC',
                 }}
               >

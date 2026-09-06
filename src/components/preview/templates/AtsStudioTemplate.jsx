@@ -36,9 +36,10 @@ export default function AtsStudioTemplate({ resume, theme }) {
   const websites = resume.websites || []
   const skillGroups = resume.skillGroups || []
   const hobbies = resume.hobbies || []
+  const projects = resume.projects || []
   const visibility = resume.visibility || {}
   const formatting = resume.formatting || {}
-  const sectionOrder = resume.sectionOrder || ['summary', 'experience', 'education', 'websites', 'skills', 'hobbies']
+  const sectionOrder = resume.sectionOrder || ['summary', 'experience', 'education', 'projects', 'websites', 'skills', 'hobbies']
 
   const setActiveItem = useResumeStore((s) => s.setActiveItem)
   const setBasic = useResumeStore((s) => s.setBasic)
@@ -65,6 +66,7 @@ export default function AtsStudioTemplate({ resume, theme }) {
   const hasHobbies = visibility.hobbies !== false && hobbies.length > 0
   const hasSummary = basic.summary && basic.summary.trim()
   const hasExperience = visibility.experience !== false && experience.length > 0
+  const hasProjects = visibility.projects !== false && projects.length > 0
 
   // Section renderers
   const renderContactAndWebsites = () => (
@@ -350,6 +352,76 @@ export default function AtsStudioTemplate({ resume, theme }) {
     </section>
   )
 
+  const renderProjects = () => (
+    <section key="projects" className="resume-block">
+      <h2
+        className="text-[11pt] font-bold uppercase tracking-wider"
+        style={{ color: accentColor }}
+      >
+        Projects
+      </h2>
+      <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-2 opacity-40" />
+
+      <div className="space-y-4">
+        {projects.map((proj) => {
+          const title = proj.title || proj.name
+          if (!title && !proj.description && !proj.techStack) return null
+          return (
+            <div
+              key={proj.id}
+              onClick={() => setActiveItem({ list: 'projects', id: proj.id })}
+              className="resume-block relative cursor-pointer group rounded p-1 hover:bg-[#FBF9F5] transition-colors"
+            >
+              <div className="flex items-baseline justify-between gap-2">
+                <h3 className="text-[10pt] font-bold text-[#1A1A1A] flex-1">
+                  <EditableText
+                    value={title}
+                    onChange={(val) => updateItem('projects', proj.id, { title: val, name: val })}
+                    placeholder="Project Title"
+                  />
+                </h3>
+                {proj.link && (
+                  <a
+                    href={toHref(proj.link)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 font-mono text-[8pt] hover:underline font-medium"
+                    style={{ color: accentColor }}
+                    onClick={(e) => e.stopPropagation()}
+                    title={proj.link}
+                  >
+                    {cleanUrl(proj.link)}
+                  </a>
+                )}
+              </div>
+
+              {proj.techStack && (
+                <div className="mt-0.5 text-[8.5pt] font-medium" style={{ color: accentColor }}>
+                  <EditableText
+                    value={proj.techStack}
+                    onChange={(val) => updateItem('projects', proj.id, { techStack: val })}
+                    placeholder="Tools / Key Skills Used"
+                  />
+                </div>
+              )}
+
+              {proj.description && (
+                <div className="mt-1 text-[9pt] text-[#2D2D2D] leading-relaxed whitespace-pre-line text-justify">
+                  <EditableText
+                    multiline
+                    value={proj.description}
+                    onChange={(val) => updateItem('projects', proj.id, { description: val })}
+                    placeholder="Project details and achievements..."
+                  />
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </section>
+  )
+
   // Map section keys to their render functions
   const SECTION_MAP = {
     websites: { hasContent: hasContact, render: renderContactAndWebsites, side: 'left' },
@@ -358,6 +430,7 @@ export default function AtsStudioTemplate({ resume, theme }) {
     hobbies: { hasContent: hasHobbies, render: renderHobbies, side: 'left' },
     summary: { hasContent: hasSummary || basic.summary === '', render: renderSummary, side: 'right' },
     experience: { hasContent: hasExperience, render: renderExperience, side: 'right' },
+    projects: { hasContent: hasProjects, render: renderProjects, side: 'right' },
   }
 
   // Sort sections in each column based on sectionOrder
@@ -371,7 +444,7 @@ export default function AtsStudioTemplate({ resume, theme }) {
 
   return (
     <div
-      className="h-full w-full bg-white text-[#1A1A1A]"
+      className="min-h-full h-auto w-full bg-white text-[#1A1A1A]"
       style={{
         fontFamily,
         color: textColor,

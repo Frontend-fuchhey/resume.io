@@ -89,8 +89,84 @@
     background-image: radial-gradient(circle, rgba(102, 96, 85, 0.12) 1px, transparent 1px);
     background-size: 20px 20px;
   }
-  .resume-block {
-    break-inside: avoid;
-    page-break-inside: avoid;
+  .resume-block,
+  .break-inside-avoid,
+  .resume-section-item,
+  .resume-card {
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+  .resume-printable-area,
+  #resume-canvas {
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+}
+
+/* Multi-Page Print & PDF Export Rules */
+@media print {
+  @page {
+    margin: 0;
+    size: auto;
+  }
+
+  html,
+  body {
+    height: auto !important;
+    min-height: 100% !important;
+    overflow: visible !important;
+    background: white !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  #root,
+  .h-screen,
+  .w-screen,
+  .min-h-screen {
+    height: auto !important;
+    width: 100% !important;
+    min-height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    position: static !important;
+  }
+
+  /* Hide navigation, sidebar, design panel, and action buttons during print */
+  aside,
+  header:not(#resume-canvas header),
+  nav,
+  .no-print,
+  [data-html2canvas-ignore="true"],
+  button {
+    display: none !important;
+  }
+
+  main,
+  .studio-grid,
+  .preview-scale-wrapper {
+    padding: 0 !important;
+    margin: 0 !important;
+    overflow: visible !important;
+    background: transparent !important;
+    transform: none !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  #resume-canvas {
+    width: 100% !important;
+    max-width: 100% !important;
+    height: auto !important;
+    max-height: none !important;
+    overflow: visible !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+    transform: none !important;
+    margin: 0 auto !important;
+    page-break-after: auto;
   }
 }
