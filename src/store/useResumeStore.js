@@ -12,6 +12,7 @@ import {
   freshSkillGroup,
   freshWebsite,
   defaultSectionOrder,
+  defaultSectionTitles,
   blankVisibility,
 } from '../lib/factory'
 import { sampleData } from '../lib/sample'
@@ -24,6 +25,17 @@ import {
   generateResumeTitle,
   getResumeHistory,
 } from '../lib/resumeHistory'
+
+let historyDebounceTimer = null
+function debouncedPushHistory(get) {
+  if (!historyDebounceTimer) {
+    get().pushHistory()
+  }
+  clearTimeout(historyDebounceTimer)
+  historyDebounceTimer = setTimeout(() => {
+    historyDebounceTimer = null
+  }, 1000)
+}
 
 function shiftBy(arr, from, dir) {
   const j = from + dir
@@ -59,6 +71,7 @@ export function snapshotState(state) {
     certifications: JSON.parse(JSON.stringify(state.certifications || [])),
     visibility: JSON.parse(JSON.stringify(state.visibility || blankVisibility())),
     sectionOrder: JSON.parse(JSON.stringify(state.sectionOrder || defaultSectionOrder())),
+    sectionTitles: JSON.parse(JSON.stringify(state.sectionTitles || defaultSectionTitles())),
     templateId: state.templateId || 'ats-studio',
     formatting: JSON.parse(JSON.stringify(state.formatting || freshFormatting())),
   }
@@ -107,6 +120,7 @@ export const useResumeStore = create(
           certifications: data.certifications || [],
           visibility: { ...blankVisibility(), ...(data.visibility || {}) },
           sectionOrder: data.sectionOrder || defaultSectionOrder(),
+          sectionTitles: { ...defaultSectionTitles(), ...(data.sectionTitles || {}) },
           templateId: data.templateId || 'ats-studio',
           formatting: { ...freshFormatting(), ...(data.formatting || {}) },
           history: [],
@@ -121,6 +135,7 @@ export const useResumeStore = create(
         const record = createResumeRecord(blank, 'Untitled Resume')
         set({
           ...blank,
+          sectionTitles: defaultSectionTitles(),
           activeResumeId: record.id,
           resumeTitle: record.title,
           history: [],
@@ -166,8 +181,19 @@ export const useResumeStore = create(
 
       // ---- basic info ------------------------------------------------
       setBasic: (patch) => {
-        get().pushHistory()
+        debouncedPushHistory(get)
         set((s) => ({ basic: { ...s.basic, ...patch } }))
+      },
+
+      // ---- section titles ---------------------------------------------
+      setSectionTitle: (key, title) => {
+        debouncedPushHistory(get)
+        set((s) => ({
+          sectionTitles: {
+            ...(s.sectionTitles || defaultSectionTitles()),
+            [key]: title,
+          },
+        }))
       },
 
       // ---- formatting panel controls ----------------------------------
@@ -203,6 +229,7 @@ export const useResumeStore = create(
       },
 
       updateItem: (list, id, patch) => {
+        debouncedPushHistory(get)
         let finalPatch = patch
         if (list === 'projects') {
           if (patch.title !== undefined && patch.name === undefined) {
@@ -248,7 +275,8 @@ export const useResumeStore = create(
           experience: s.experience.map((it) => (it.id === expId ? { ...it, bullets } : it)),
         })),
 
-      updateBullet: (expId, index, text) =>
+      updateBullet: (expId, index, text) => {
+        debouncedPushHistory(get)
         set((s) => ({
           experience: s.experience.map((it) => {
             if (it.id !== expId) return it
@@ -256,7 +284,8 @@ export const useResumeStore = create(
             bullets[index] = text
             return { ...it, bullets }
           }),
-        })),
+        }))
+      },
 
       removeBullet: (expId, index) => {
         get().pushHistory()
@@ -290,7 +319,8 @@ export const useResumeStore = create(
           skillGroups: s.skillGroups.map((g) => (g.id === gid ? { ...g, items: [...g.items, ''] } : g)),
         })),
 
-      updateSkill: (gid, index, text) =>
+      updateSkill: (gid, index, text) => {
+        debouncedPushHistory(get)
         set((s) => ({
           skillGroups: s.skillGroups.map((g) => {
             if (g.id !== gid) return g
@@ -298,7 +328,8 @@ export const useResumeStore = create(
             items[index] = text
             return { ...g, items }
           }),
-        })),
+        }))
+      },
 
       removeSkill: (gid, index) =>
         set((s) => ({
@@ -337,6 +368,7 @@ export const useResumeStore = create(
           certifications: data.certifications || [],
           visibility: { ...blankVisibility(), ...(data.visibility || {}) },
           sectionOrder: data.sectionOrder || defaultSectionOrder(),
+          sectionTitles: { ...defaultSectionTitles(), ...(data.sectionTitles || {}) },
           templateId: data.templateId || 'ats-studio',
           formatting: { ...freshFormatting(), ...(data.formatting || {}) },
         }
@@ -364,6 +396,7 @@ export const useResumeStore = create(
         const record = createResumeRecord(blank, 'Blank Resume')
         set(() => ({
           ...blank,
+          sectionTitles: defaultSectionTitles(),
           activeResumeId: record.id,
           resumeTitle: record.title,
           history: [],
@@ -374,7 +407,7 @@ export const useResumeStore = create(
 
       loadSample: () => {
         const sample = sampleData()
-        const initial = { ...sample, sectionOrder: defaultSectionOrder() }
+        const initial = { ...sample, sectionOrder: defaultSectionOrder(), sectionTitles: defaultSectionTitles() }
         const title = generateResumeTitle(initial, 'Sample Resume')
         const record = createResumeRecord(initial, title)
         set(() => ({
@@ -463,6 +496,7 @@ useResumeStore.subscribe((state, prevState) => {
     state.certifications !== prevState.certifications ||
     state.visibility !== prevState.visibility ||
     state.sectionOrder !== prevState.sectionOrder ||
+    state.sectionTitles !== prevState.sectionTitles ||
     state.templateId !== prevState.templateId ||
     state.formatting !== prevState.formatting ||
     state.resumeTitle !== prevState.resumeTitle

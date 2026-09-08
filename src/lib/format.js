@@ -20,10 +20,12 @@ export function prettyDate(value) {
 }
 
 export function dateRange(item, endLabel = 'Present') {
+  if (!item) return ''
+  if (item.dateStr && item.dateStr.trim()) return item.dateStr.trim()
   const start = prettyDate(item.startDate)
   const end = item.current ? endLabel : prettyDate(item.endDate)
   if (start && end) return `${start} — ${end}`
-  return start || end
+  return start || end || ''
 }
 
 /**

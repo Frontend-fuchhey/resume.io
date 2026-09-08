@@ -74,9 +74,15 @@ export async function exportToPdf(resumeData) {
           clonedCanvas.style.maxHeight = 'none'
           clonedCanvas.style.overflow = 'visible'
         }
-        // Remove interactive editor artifacts (page-break guides, add bullet buttons)
+        // Remove interactive editor artifacts (page-break guides, add bullet buttons, popovers)
         clonedDoc.querySelectorAll('[data-html2canvas-ignore="true"]').forEach((el) => {
           el.remove()
+        })
+        // Ensure editable text has zero outline/focus artifacts in print
+        clonedDoc.querySelectorAll('[contenteditable]').forEach((el) => {
+          el.removeAttribute('contenteditable')
+          el.style.outline = 'none'
+          el.style.boxShadow = 'none'
         })
       },
     },

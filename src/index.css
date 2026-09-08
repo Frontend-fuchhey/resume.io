@@ -102,6 +102,15 @@
     max-height: none !important;
     overflow: visible !important;
   }
+
+  /* Inline Canvas Editable Placeholder */
+  [contenteditable][data-placeholder]:empty::before {
+    content: attr(data-placeholder);
+    color: #9E988E;
+    font-style: italic;
+    pointer-events: none;
+    user-select: none;
+  }
 }
 
 /* Multi-Page Print & PDF Export Rules */

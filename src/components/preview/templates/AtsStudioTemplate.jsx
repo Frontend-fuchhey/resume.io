@@ -13,6 +13,8 @@ import {
 import { useResumeStore } from '../../../store/useResumeStore'
 import { dateRange, cleanUrl, toHref } from '../../../lib/format'
 import { EditableText } from '../EditableText'
+import { EditableLink } from '../EditableLink'
+import { EditableDate } from '../EditableDate'
 
 const FONT_MAP = {
   Poppins: "'Poppins', sans-serif",
@@ -40,12 +42,15 @@ export default function AtsStudioTemplate({ resume, theme }) {
   const visibility = resume.visibility || {}
   const formatting = resume.formatting || {}
   const sectionOrder = resume.sectionOrder || ['summary', 'experience', 'education', 'projects', 'websites', 'skills', 'hobbies']
+  const sectionTitles = resume.sectionTitles || {}
 
   const setActiveItem = useResumeStore((s) => s.setActiveItem)
   const setBasic = useResumeStore((s) => s.setBasic)
   const updateItem = useResumeStore((s) => s.updateItem)
   const updateBullet = useResumeStore((s) => s.updateBullet)
   const updateSkill = useResumeStore((s) => s.updateSkill)
+  const renameSkillGroup = useResumeStore((s) => s.renameSkillGroup)
+  const setSectionTitle = useResumeStore((s) => s.setSectionTitle)
 
   // Typography & design styling from Right Toolbar
   const fontFamily = FONT_MAP[formatting.fontFamily] || "'Poppins', sans-serif"
@@ -75,7 +80,11 @@ export default function AtsStudioTemplate({ resume, theme }) {
         className="text-[10pt] font-bold uppercase tracking-wider"
         style={{ color: accentColor }}
       >
-        Contact Details
+        <EditableText
+          value={sectionTitles.websites || 'Contact Details'}
+          onChange={(val) => setSectionTitle('websites', val)}
+          placeholder="Contact Details"
+        />
       </h2>
       <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-1.5 opacity-40" />
       <div className="space-y-2 text-[9pt] text-[#403D39]">
@@ -115,25 +124,56 @@ export default function AtsStudioTemplate({ resume, theme }) {
         {websites.map((w) => (
           <div key={w.id} className="flex items-center gap-2">
             <Globe size={12} className="shrink-0" style={{ color: accentColor }} />
-            <span className="truncate flex-1">
-              {w.label ? <strong className="font-semibold">{w.label}: </strong> : null}
-              {w.url ? (
-                <a
-                  href={toHref(w.url)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline transition-colors font-mono text-[8.5pt]"
-                  style={{ color: accentColor }}
-                  title={w.url}
-                >
-                  {cleanUrl(w.url)}
-                </a>
-              ) : (
-                <span className="text-[#9E988E] italic text-[8.5pt]">link</span>
-              )}
-            </span>
+            <div className="flex items-baseline gap-1 truncate flex-1 min-w-0">
+              <EditableText
+                value={w.label}
+                onChange={(val) => updateItem('websites', w.id, { label: val })}
+                placeholder="Platform"
+                className="font-semibold shrink-0"
+              />
+              <span className="shrink-0 font-semibold">:</span>
+              <EditableLink
+                url={w.url}
+                label={w.label}
+                accentColor={accentColor}
+                onChange={(newUrl) => updateItem('websites', w.id, { url: typeof newUrl === 'string' ? newUrl : newUrl.url })}
+                onDelete={() => useResumeStore.getState().removeItem('websites', w.id)}
+                placeholder="Add URL..."
+                className="text-[8.5pt]"
+              />
+            </div>
           </div>
         ))}
+        {basic.linkedin && !websites.some((w) => (w.url || '').toLowerCase().includes('linkedin')) && (
+          <div className="flex items-center gap-2">
+            <Globe size={12} className="shrink-0" style={{ color: accentColor }} />
+            <div className="flex items-baseline gap-1 truncate flex-1 min-w-0">
+              <strong className="font-semibold shrink-0">LinkedIn:</strong>
+              <EditableLink
+                url={basic.linkedin}
+                accentColor={accentColor}
+                onChange={(newUrl) => setBasic({ linkedin: typeof newUrl === 'string' ? newUrl : newUrl.url })}
+                placeholder="Add LinkedIn URL..."
+                className="text-[8.5pt]"
+              />
+            </div>
+          </div>
+        )}
+        {basic.portfolio && !websites.some((w) => (w.url || '').toLowerCase().includes('portfolio')) && (
+          <div className="flex items-center gap-2">
+            <Globe size={12} className="shrink-0" style={{ color: accentColor }} />
+            <div className="flex items-baseline gap-1 truncate flex-1 min-w-0">
+              <strong className="font-semibold shrink-0">Portfolio:</strong>
+              <EditableLink
+                url={basic.portfolio}
+                accentColor={accentColor}
+                onChange={(newUrl) => setBasic({ portfolio: typeof newUrl === 'string' ? newUrl : newUrl.url })}
+                placeholder="Add Portfolio URL..."
+                className="text-[8.5pt]"
+              />
+            </div>
+          </div>
+        )}
       </div>
     </section>
   )
@@ -144,7 +184,11 @@ export default function AtsStudioTemplate({ resume, theme }) {
         className="text-[10pt] font-bold uppercase tracking-wider"
         style={{ color: accentColor }}
       >
-        Education
+        <EditableText
+          value={sectionTitles.education || 'Education'}
+          onChange={(val) => setSectionTitle('education', val)}
+          placeholder="Education"
+        />
       </h2>
       <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-1.5 opacity-40" />
       <div className="space-y-3">
@@ -197,17 +241,23 @@ export default function AtsStudioTemplate({ resume, theme }) {
         className="text-[10pt] font-bold uppercase tracking-wider"
         style={{ color: accentColor }}
       >
-        Skills & Competencies
+        <EditableText
+          value={sectionTitles.skills || 'Skills & Competencies'}
+          onChange={(val) => setSectionTitle('skills', val)}
+          placeholder="Skills & Competencies"
+        />
       </h2>
       <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-1.5 opacity-40" />
       <div className="space-y-2.5">
         {skillGroups.map((g) => (
           <div key={g.id} className="resume-block">
-            {g.label && (
-              <div className="text-[8.5pt] font-bold uppercase tracking-wide text-[#666055] mb-1">
-                {g.label}
-              </div>
-            )}
+            <div className="text-[8.5pt] font-bold uppercase tracking-wide text-[#666055] mb-1">
+              <EditableText
+                value={g.label}
+                onChange={(val) => renameSkillGroup(g.id, val)}
+                placeholder="Skill Category"
+              />
+            </div>
             <div className="flex flex-wrap gap-1">
               {g.items.map((item, idx) => (
                 <span
@@ -234,7 +284,11 @@ export default function AtsStudioTemplate({ resume, theme }) {
         className="text-[10pt] font-bold uppercase tracking-wider"
         style={{ color: accentColor }}
       >
-        Hobbies & Interests
+        <EditableText
+          value={sectionTitles.hobbies || 'Hobbies & Interests'}
+          onChange={(val) => setSectionTitle('hobbies', val)}
+          placeholder="Hobbies & Interests"
+        />
       </h2>
       <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-1.5 opacity-40" />
       <div className="flex flex-wrap gap-1.5">
@@ -261,7 +315,11 @@ export default function AtsStudioTemplate({ resume, theme }) {
         className="text-[11pt] font-bold uppercase tracking-wider"
         style={{ color: accentColor }}
       >
-        Profile Summary
+        <EditableText
+          value={sectionTitles.summary || 'Profile Summary'}
+          onChange={(val) => setSectionTitle('summary', val)}
+          placeholder="Profile Summary"
+        />
       </h2>
       <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-1.5 opacity-40" />
       <div className="text-[9.5pt] text-[#2D2D2D] leading-relaxed text-justify">
@@ -282,7 +340,11 @@ export default function AtsStudioTemplate({ resume, theme }) {
         className="text-[11pt] font-bold uppercase tracking-wider"
         style={{ color: accentColor }}
       >
-        Employment History
+        <EditableText
+          value={sectionTitles.experience || 'Employment History'}
+          onChange={(val) => setSectionTitle('experience', val)}
+          placeholder="Employment History"
+        />
       </h2>
       <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-2 opacity-40" />
 
@@ -309,7 +371,10 @@ export default function AtsStudioTemplate({ resume, theme }) {
                 />
               </h3>
               <span className="shrink-0 text-[8.5pt] font-semibold text-[#666055]">
-                {dateRange(exp)}
+                <EditableDate
+                  item={exp}
+                  onPatch={(patch) => updateItem('experience', exp.id, patch)}
+                />
               </span>
             </div>
 
@@ -358,7 +423,11 @@ export default function AtsStudioTemplate({ resume, theme }) {
         className="text-[11pt] font-bold uppercase tracking-wider"
         style={{ color: accentColor }}
       >
-        Projects
+        <EditableText
+          value={sectionTitles.projects || 'Projects'}
+          onChange={(val) => setSectionTitle('projects', val)}
+          placeholder="Projects"
+        />
       </h2>
       <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-2 opacity-40" />
 
@@ -380,19 +449,14 @@ export default function AtsStudioTemplate({ resume, theme }) {
                     placeholder="Project Title"
                   />
                 </h3>
-                {proj.link && (
-                  <a
-                    href={toHref(proj.link)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="shrink-0 font-mono text-[8pt] hover:underline font-medium"
-                    style={{ color: accentColor }}
-                    onClick={(e) => e.stopPropagation()}
-                    title={proj.link}
-                  >
-                    {cleanUrl(proj.link)}
-                  </a>
-                )}
+                <EditableLink
+                  url={proj.link}
+                  accentColor={accentColor}
+                  onChange={(newUrl) => updateItem('projects', proj.id, { link: typeof newUrl === 'string' ? newUrl : newUrl.url })}
+                  onDelete={() => updateItem('projects', proj.id, { link: '' })}
+                  placeholder="Add link..."
+                  className="shrink-0 text-[8pt] font-medium"
+                />
               </div>
 
               {proj.techStack && (

@@ -1,12 +1,13 @@
-import { useEffect, useRef, useState } from 'react'
+import { useLayoutEffect, useRef, useState } from 'react'
 
 /**
  * In-Canvas Direct Text Editing Component
- * Supports two-way data binding with central store without cursor jumps or focus loss.
+ * Supports two-way real-time data binding with central store without cursor jumps or focus loss.
  */
 export function EditableText({
   value = '',
   onChange,
+  onBlur,
   placeholder = 'Click to edit...',
   className = '',
   style = {},
@@ -15,24 +16,35 @@ export function EditableText({
 }) {
   const ref = useRef(null)
   const [isFocused, setIsFocused] = useState(false)
-  const isInternalChange = useRef(false)
 
-  // Sync external value changes into DOM only if not actively focused
-  useEffect(() => {
+  // Initialize and sync external value changes into DOM only if not actively focused
+  useLayoutEffect(() => {
     if (ref.current && !isFocused) {
-      if (ref.current.innerText !== (value || '')) {
-        ref.current.innerText = value || ''
+      const currentText = ref.current.innerText || ''
+      const targetText = value || ''
+      if (currentText !== targetText) {
+        ref.current.innerText = targetText
       }
     }
   }, [value, isFocused])
 
+  const handleInput = (e) => {
+    if (onChange) {
+      const text = e.currentTarget.innerText
+      onChange(text)
+    }
+  }
+
   const handleBlur = (e) => {
     setIsFocused(false)
     const text = e.currentTarget.innerText.trim()
-    if (text !== value && onChange) {
-      isInternalChange.current = true
+    if (!text && ref.current) {
+      ref.current.innerText = ''
+    }
+    if (text !== (value || '').trim() && onChange) {
       onChange(text)
     }
+    if (onBlur) onBlur(text)
   }
 
   const handleFocus = () => {
@@ -43,6 +55,18 @@ export function EditableText({
     if (!multiline && e.key === 'Enter') {
       e.preventDefault()
       e.currentTarget.blur()
+    } else if (e.key === 'Escape') {
+      e.currentTarget.blur()
+    }
+  }
+
+  const handlePaste = (e) => {
+    e.preventDefault()
+    const text = e.clipboardData.getData('text/plain')
+    const clean = multiline ? text : text.replace(/[\r\n]+/g, ' ')
+    document.execCommand('insertText', false, clean)
+    if (onChange && ref.current) {
+      onChange(ref.current.innerText)
     }
   }
 
@@ -53,18 +77,18 @@ export function EditableText({
       ref={ref}
       contentEditable
       suppressContentEditableWarning
+      onInput={handleInput}
       onFocus={handleFocus}
       onBlur={handleBlur}
       onKeyDown={handleKeyDown}
+      onPaste={handlePaste}
       data-placeholder={placeholder}
-      className={`relative inline-block cursor-text rounded px-1 -mx-1 transition-colors select-text
-        hover:bg-[#FF5E1A]/10 hover:outline hover:outline-1 hover:outline-[#FF5E1A]/30
-        focus:outline-none focus:ring-2 focus:ring-[#FF5E1A]/40 focus:bg-[#FF5E1A]/5
+      className={`relative inline-block cursor-text rounded px-1 -mx-1 transition-all select-text
+        hover:outline hover:outline-1 hover:outline-blue-500/35 hover:bg-blue-500/[0.04]
+        focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:bg-blue-500/[0.05]
         ${isEmpty ? 'text-[#9E988E] italic' : ''}
         ${className}`}
       style={style}
-    >
-      {isEmpty ? placeholder : value}
-    </Component>
+    />
   )
 }

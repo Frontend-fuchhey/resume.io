@@ -18,7 +18,7 @@ export function freshBasic() {
 }
 
 export function freshExperience() {
-  return { id: uid(), role: '', company: '', location: '', startDate: '', endDate: '', current: false, bullets: [''] }
+  return { id: uid(), role: '', company: '', location: '', startDate: '', endDate: '', dateStr: '', current: false, bullets: [''] }
 }
 
 export function freshEducation() {
@@ -67,6 +67,19 @@ export function defaultSectionOrder() {
   return ['summary', 'experience', 'education', 'projects', 'websites', 'skills', 'hobbies']
 }
 
+export function defaultSectionTitles() {
+  return {
+    summary: 'Profile Summary',
+    experience: 'Employment History',
+    education: 'Education',
+    projects: 'Projects',
+    websites: 'Contact Details',
+    skills: 'Skills & Competencies',
+    hobbies: 'Hobbies & Interests',
+    certifications: 'Certifications',
+  }
+}
+
 export function blankVisibility() {
   return {
     experience: true,
@@ -92,6 +105,7 @@ export function blankResume() {
     certifications: [],
     visibility: blankVisibility(),
     sectionOrder: defaultSectionOrder(),
+    sectionTitles: defaultSectionTitles(),
     templateId: 'ats-studio',
     formatting: freshFormatting(),
   }
