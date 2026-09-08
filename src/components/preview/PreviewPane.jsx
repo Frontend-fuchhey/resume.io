@@ -37,7 +37,7 @@ const OUTLINE_MAP = {
   accent: 'border-2 border-[#FF5E1A]/50',
 }
 
-export function PreviewPane({ onDownload, isDownloading }) {
+export function PreviewPane({ onDownload, isDownloading, onOpenImport, onOpenHistory }) {
   const resume = useResumeStore()
   const templateId = resume.templateId || 'ats-studio'
   const formatting = resume.formatting || {}
@@ -115,6 +115,8 @@ export function PreviewPane({ onDownload, isDownloading }) {
           zoomOptions={['32%', '50%', '75%', '100%', 'Fit']}
           onDownload={onDownload}
           isDownloading={isDownloading}
+          onOpenImport={onOpenImport}
+          onOpenHistory={onOpenHistory}
         />
       </div>
 

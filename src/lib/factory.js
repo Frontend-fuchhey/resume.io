@@ -1,4 +1,4 @@
-import { uid } from './utils'
+import { uid } from './utils.js'
 
 /** Fresh-entity factories used by the store and by UI "add" actions. */
 

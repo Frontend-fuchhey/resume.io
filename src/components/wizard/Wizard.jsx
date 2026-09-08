@@ -1,6 +1,17 @@
 import { useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Briefcase, FileText, FolderGit2, Globe, GraduationCap, Heart, LayoutTemplate, Tag } from 'lucide-react'
+import {
+  Briefcase,
+  FileText,
+  FileUp,
+  FolderGit2,
+  Globe,
+  GraduationCap,
+  Heart,
+  LayoutTemplate,
+  Sparkles,
+  Tag,
+} from 'lucide-react'
 import resumeIoLogo from '@/assets/resume-io.png'
 import { Button } from '../ui/primitives'
 import { toast } from '../../store/useUIStore'
@@ -14,6 +25,7 @@ import { WebsitesManager } from '../forms/WebsitesManager'
 import { SkillsManager } from '../forms/SkillsManager'
 import { HobbiesManager } from '../forms/HobbiesManager'
 import { TemplateGrid } from './TemplateGrid'
+import { ImportResumeModal } from '../modals/ImportResumeModal'
 import { cn } from '../../lib/utils'
 
 const STEPS = [
@@ -32,6 +44,7 @@ export function Wizard({ onFinish, onExit }) {
   const basic = useResumeStore((s) => s.basic)
   const [idx, setIdx] = useState(0)
   const [attempted, setAttempted] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
 
   const errors = []
   if (!basic.fullName?.trim()) errors.push('Full name is required')
@@ -68,16 +81,29 @@ export function Wizard({ onFinish, onExit }) {
     onFinish()
   }
 
+  const handleImportSuccess = () => {
+    onFinish()
+  }
+
   return (
     <div className="flex min-h-screen flex-col bg-[#FBF9F5] text-[#1A1A1A]">
       {/* Top bar */}
-      <header className="mx-auto flex w-full max-w-4xl items-center gap-3 px-5 py-5">
+      <header className="mx-auto flex w-full max-w-4xl items-center justify-between px-5 py-5">
         <button onClick={onExit} className="text-sm font-semibold transition-opacity hover:opacity-80" aria-label="Leave wizard">
           <img
             src={resumeIoLogo}
             alt="resume.io"
             className="h-8 w-auto object-contain"
           />
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setImportOpen(true)}
+          className="inline-flex items-center gap-1.5 rounded-xl border border-[#E5E2DC] bg-white px-3 py-1.5 text-xs font-semibold text-[#1A1A1A] hover:border-[#FF5E1A] hover:text-[#FF5E1A] hover:bg-[#FFF3EB] transition-all shadow-xs"
+        >
+          <FileUp size={14} className="text-[#FF5E1A]" />
+          <span>Import Existing CV (.pdf, .docx)</span>
         </button>
       </header>
 
@@ -133,6 +159,23 @@ export function Wizard({ onFinish, onExit }) {
             </span>
           </div>
 
+          {/* Quick Import existing CV Banner on Step 1 */}
+          {idx === 0 && (
+            <div className="mb-4 flex items-center justify-between rounded-xl border border-[#E8E4DC] bg-[#FFF8F5] p-3 text-xs text-[#1A1A1A]">
+              <div className="flex items-center gap-2">
+                <Sparkles size={16} className="text-[#FF5E1A] shrink-0" />
+                <span>Already have a CV? Skip manual typing by importing your .pdf or .docx file.</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => setImportOpen(true)}
+                className="shrink-0 font-bold text-[#FF5E1A] hover:underline ml-2"
+              >
+                Import CV →
+              </button>
+            </div>
+          )}
+
           {attempted && idx === 0 && errors.length > 0 && (
             <div className="mb-4 rounded-lg border border-rose-200 bg-rose-50 px-4 py-2 text-xs font-medium text-rose-700">
               {errors.map((e) => (
@@ -172,6 +215,13 @@ export function Wizard({ onFinish, onExit }) {
           </Button>
         </div>
       </div>
+
+      {/* Import Modal */}
+      <ImportResumeModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onImportSuccess={handleImportSuccess}
+      />
     </div>
   )
 }

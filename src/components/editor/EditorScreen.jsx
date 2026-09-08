@@ -1,5 +1,17 @@
-import { useState } from 'react'
-import { ArrowLeft, FileText, Layers, PenTool, UserCircle2 } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import {
+  ArrowLeft,
+  Check,
+  Edit3,
+  FileText,
+  FileUp,
+  FolderOpen,
+  Layers,
+  Loader2,
+  PenTool,
+  Plus,
+  UserCircle2,
+} from 'lucide-react'
 import logoImg from '../../assets/resume-logo.png'
 import { ResumeEditor } from './ResumeEditor'
 import { TemplateGallery } from './TemplateGallery'
@@ -10,6 +22,8 @@ import { toast } from '../../store/useUIStore'
 import { exportResumePdf } from '../../pdf/exportPdf'
 import { resumeFilename } from '../../lib/names'
 import { AboutCreatorModal } from '../AboutCreatorModal'
+import { ImportResumeModal } from '../modals/ImportResumeModal'
+import { SavedResumesModal } from '../modals/SavedResumesModal'
 
 export function EditorScreen({ onHome }) {
   const navigate = (path = '/') => {
@@ -17,14 +31,26 @@ export function EditorScreen({ onHome }) {
     else window.location.href = path
   }
   const resume = useResumeStore()
+  const resumeTitle = useResumeStore((s) => s.resumeTitle)
+  const setResumeTitle = useResumeStore((s) => s.setResumeTitle)
+  const isSaving = useResumeStore((s) => s.isSaving)
+
   const [leftTab, setLeftTab] = useState('create') // 'create' | 'templates'
   const [busy, setBusy] = useState(false)
   const [mobilePane, setMobilePane] = useState('canvas') // 'left' | 'canvas' | 'right'
   const [aboutOpen, setAboutOpen] = useState(false)
+  const [importOpen, setImportOpen] = useState(false)
+  const [historyOpen, setHistoryOpen] = useState(false)
+  const [editingTitle, setEditingTitle] = useState(false)
+  const [titleInput, setTitleInput] = useState('')
 
   const rawName = resume.basic.fullName?.trim() || ''
   const displayName = rawName || 'Untitled Resume'
   const exportFile = resumeFilename(rawName)
+
+  useEffect(() => {
+    setTitleInput(resumeTitle || displayName)
+  }, [resumeTitle, displayName])
 
   const handleDownload = async () => {
     if (busy) return
@@ -51,50 +77,133 @@ export function EditorScreen({ onHome }) {
       {/* 1. LEFT SIDEBAR PANE: Forms & Navigation (Tab Switcher: Create | Templates) */}
       {/* ========================================================================= */}
       <aside
-        className={`flex h-full w-full flex-col border-r border-[#E8E4DC] bg-white transition-all lg:w-[410px] lg:shrink-0 ${
+        className={`flex h-full w-full flex-col border-r border-[#E8E4DC] bg-white transition-all lg:w-[420px] lg:shrink-0 ${
           mobilePane === 'left' ? 'flex' : 'hidden lg:flex'
         }`}
       >
         {/* Top Header & Brand */}
-        <div className="flex shrink-0 items-center justify-between border-b border-[#E8E4DC] px-4 py-2.5 bg-[#FBF9F5]/60">
-          <div className="flex items-center gap-2.5">
-            <button
-              type="button"
-              onClick={onHome}
-              title="Return to Home"
-              className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#E8E4DC] bg-white text-[#666055] hover:border-[#FF5E1A] hover:text-[#FF5E1A] transition-colors"
-            >
-              <ArrowLeft size={16} />
-            </button>
-            <img 
-              src={logoImg} 
-              alt="resume.io" 
-              className="h-7 w-auto object-contain cursor-pointer" 
-              onClick={() => navigate('/')} 
-            />
-            <div className="min-w-0 max-w-[180px]">
-              <div className="flex items-center gap-1.5 text-xs font-bold text-[#1A1A1A]">
-                <FileText size={12} className="shrink-0 text-[#FF5E1A]" />
-                <span className="truncate">{displayName}</span>
-              </div>
-              <div className="truncate font-mono text-[9px] text-[#666055]">
-                {exportFile}
-              </div>
+        <div className="flex shrink-0 flex-col border-b border-[#E8E4DC] bg-[#FBF9F5]/70">
+          <div className="flex items-center justify-between px-3.5 py-2.5">
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={onHome}
+                title="Return to Home"
+                className="flex h-8 w-8 items-center justify-center rounded-lg border border-[#E8E4DC] bg-white text-[#666055] hover:border-[#FF5E1A] hover:text-[#FF5E1A] transition-colors"
+              >
+                <ArrowLeft size={16} />
+              </button>
+              <img
+                src={logoImg}
+                alt="resume.io"
+                className="h-7 w-auto object-contain cursor-pointer"
+                onClick={() => navigate('/')}
+              />
+            </div>
+
+            {/* Quick Action buttons */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={() => setHistoryOpen(true)}
+                title="My Resumes & History"
+                className="inline-flex items-center gap-1 rounded-lg border border-[#E5E2DC] bg-white px-2.5 py-1 text-[11px] font-semibold text-[#1A1A1A] hover:border-[#FF5E1A] hover:text-[#FF5E1A] hover:bg-[#FFF3EB] transition-all shadow-xs"
+              >
+                <FolderOpen size={13} className="text-[#FF5E1A]" />
+                <span className="hidden sm:inline">My Resumes</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setImportOpen(true)}
+                title="Import / Edit Existing CV (.pdf, .docx)"
+                className="inline-flex items-center gap-1 rounded-lg border border-[#E5E2DC] bg-white px-2 py-1 text-[11px] font-semibold text-[#1A1A1A] hover:border-[#FF5E1A] hover:text-[#FF5E1A] hover:bg-[#FFF3EB] transition-all shadow-xs"
+              >
+                <FileUp size={13} className="text-[#FF5E1A]" />
+                <span className="hidden sm:inline">Import</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  useResumeStore.getState().newResume('ats-studio')
+                  toast('Created new blank resume canvas')
+                }}
+                title="Create New Resume"
+                className="flex h-7 w-7 items-center justify-center rounded-lg border border-[#E5E2DC] bg-white text-[#666055] hover:border-[#FF5E1A] hover:text-[#FF5E1A] hover:bg-[#FFF3EB] transition-all shadow-xs"
+              >
+                <Plus size={14} />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setAboutOpen(true)}
+                title="About Creator"
+                aria-label="About Creator"
+                className="flex h-7 w-7 items-center justify-center rounded-lg border border-[#E5E2DC] bg-white text-[#666055] hover:border-[#FF5E1A] hover:text-[#FF5E1A] transition-all shadow-xs"
+              >
+                <UserCircle2 size={14} />
+              </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* ── About Creator button ── */}
-            <button
-              type="button"
-              onClick={() => setAboutOpen(true)}
-              title="About Creator"
-              aria-label="About Creator"
-              className="group flex items-center gap-1.5 rounded-lg border border-[#E5E2DC] bg-white px-2.5 py-1.5 text-[11px] font-semibold text-[#666055] transition-all hover:border-[#FF5E1A] hover:text-[#FF5E1A] hover:bg-[#FFF3EB]"
-            >
-              <UserCircle2 size={14} className="shrink-0 transition-colors group-hover:text-[#FF5E1A]" />
-              <span className="hidden sm:inline">About</span>
-            </button>
+          {/* Active Status Bar: Editing [Title] + Auto-save indicator */}
+          <div className="flex items-center justify-between border-t border-[#E8E4DC]/80 bg-white px-3.5 py-1.5">
+            <div className="flex items-center gap-1.5 min-w-0 flex-1 mr-2">
+              <span className="text-[10.5px] font-semibold text-[#8C857B] shrink-0">Editing:</span>
+              {editingTitle ? (
+                <input
+                  autoFocus
+                  type="text"
+                  value={titleInput}
+                  onChange={(e) => setTitleInput(e.target.value)}
+                  onBlur={() => {
+                    if (titleInput.trim()) setResumeTitle(titleInput.trim())
+                    setEditingTitle(false)
+                  }}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      if (titleInput.trim()) setResumeTitle(titleInput.trim())
+                      setEditingTitle(false)
+                    }
+                    if (e.key === 'Escape') setEditingTitle(false)
+                  }}
+                  className="rounded border border-[#FF5E1A] px-1.5 py-0.5 text-xs font-bold text-[#1A1A1A] outline-none w-full"
+                />
+              ) : (
+                <div
+                  onClick={() => {
+                    setTitleInput(resumeTitle || displayName)
+                    setEditingTitle(true)
+                  }}
+                  title="Click to rename resume"
+                  className="group/title flex items-center gap-1 cursor-pointer truncate max-w-[210px]"
+                >
+                  <span className="truncate text-xs font-bold text-[#1A1A1A] group-hover/title:text-[#FF5E1A] transition-colors">
+                    {resumeTitle || displayName}
+                  </span>
+                  <Edit3
+                    size={11}
+                    className="shrink-0 text-[#8C857B] opacity-0 group-hover/title:opacity-100 transition-opacity"
+                  />
+                </div>
+              )}
+            </div>
+
+            {/* Save Status */}
+            <div className="flex items-center gap-1 text-[10.5px] shrink-0">
+              {isSaving ? (
+                <span className="flex items-center gap-1 text-[#8C857B]">
+                  <Loader2 size={11} className="animate-spin text-[#FF5E1A]" />
+                  Saving…
+                </span>
+              ) : (
+                <span className="flex items-center gap-1 text-emerald-600 font-medium">
+                  <Check size={11} strokeWidth={2.5} />
+                  Saved
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -142,7 +251,12 @@ export function EditorScreen({ onHome }) {
           mobilePane === 'canvas' ? 'flex' : 'hidden lg:flex'
         }`}
       >
-        <PreviewPane onDownload={handleDownload} isDownloading={busy} />
+        <PreviewPane
+          onDownload={handleDownload}
+          isDownloading={busy}
+          onOpenImport={() => setImportOpen(true)}
+          onOpenHistory={() => setHistoryOpen(true)}
+        />
       </main>
 
       {/* ========================================================================= */}
@@ -190,8 +304,14 @@ export function EditorScreen({ onHome }) {
         </button>
       </div>
 
-      {/* About Creator Modal */}
+      {/* Modals */}
       <AboutCreatorModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
+      <ImportResumeModal open={importOpen} onClose={() => setImportOpen(false)} />
+      <SavedResumesModal
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        onOpenImport={() => setImportOpen(true)}
+      />
     </div>
   )
 }

@@ -3,6 +3,8 @@ import { motion } from "framer-motion";
 import {
   ArrowRight,
   FileDown,
+  FileUp,
+  FolderOpen,
   Layers,
   LayoutTemplate,
   PenTool,
@@ -25,6 +27,8 @@ import { TEMPLATES } from "../../config/templates";
 import { MiniPreview } from "../wizard/TemplateGrid";
 import { hasResumeData, useResumeStore } from "../../store/useResumeStore";
 import { AboutCreatorModal } from "../AboutCreatorModal";
+import { ImportResumeModal } from "../modals/ImportResumeModal";
+import { SavedResumesModal } from "../modals/SavedResumesModal";
 
 const FEATURES = [
   {
@@ -52,6 +56,16 @@ const fadeUp = {
 export function Landing({ onStart, onContinue, onSample }) {
   const hasData = useResumeStore((s) => hasResumeData(s));
   const [aboutOpen, setAboutOpen] = useState(false);
+  const [importOpen, setImportOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+
+  const handleImportSuccess = () => {
+    onContinue();
+  };
+
+  const handleSelectResume = () => {
+    onContinue();
+  };
 
   return (
     <div className="mx-auto flex min-h-screen w-full max-w-5xl flex-col px-5 pb-16">
@@ -63,19 +77,42 @@ export function Landing({ onStart, onContinue, onSample }) {
             className="h-8 w-auto object-contain hover:opacity-90 transition-opacity" 
           />
         </Link>
-        {/* ── About Creator button ── */}
-        <button
-          type="button"
-          onClick={() => setAboutOpen(true)}
-          className="group inline-flex items-center gap-2 rounded-xl border border-[#E5E2DC] bg-white px-3.5 py-2 text-[12px] font-semibold text-[#666055] shadow-sm transition-all hover:border-[#FF5E1A] hover:text-[#FF5E1A] hover:bg-[#FFF3EB] hover:shadow-md active:scale-[0.97]"
-          style={{ fontFamily: "'Poppins', sans-serif" }}
-          aria-label="About Creator"
-        >
-          <UserCircle2 size={15} className="transition-colors group-hover:text-[#FF5E1A]" />
-          About Creator
-        </button>
-      </header>
+        <div className="flex items-center gap-2">
+          {/* ── My Resumes button ── */}
+          <button
+            type="button"
+            onClick={() => setHistoryOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-[#E5E2DC] bg-white px-3 py-2 text-[12px] font-semibold text-[#1A1A1A] shadow-sm transition-all hover:border-[#FF5E1A] hover:text-[#FF5E1A] hover:bg-[#FFF3EB] active:scale-[0.97]"
+            style={{ fontFamily: "'Poppins', sans-serif" }}
+          >
+            <FolderOpen size={14} className="text-[#FF5E1A]" />
+            <span>My Resumes</span>
+          </button>
 
+          {/* ── Import Existing CV button ── */}
+          <button
+            type="button"
+            onClick={() => setImportOpen(true)}
+            className="inline-flex items-center gap-1.5 rounded-xl border border-[#E5E2DC] bg-white px-3 py-2 text-[12px] font-semibold text-[#1A1A1A] shadow-sm transition-all hover:border-[#FF5E1A] hover:text-[#FF5E1A] hover:bg-[#FFF3EB] active:scale-[0.97]"
+            style={{ fontFamily: "'Poppins', sans-serif" }}
+          >
+            <FileUp size={14} className="text-[#FF5E1A]" />
+            <span className="hidden sm:inline">Import CV</span>
+          </button>
+
+          {/* ── About Creator button ── */}
+          <button
+            type="button"
+            onClick={() => setAboutOpen(true)}
+            className="group inline-flex items-center gap-1.5 rounded-xl border border-[#E5E2DC] bg-white px-3 py-2 text-[12px] font-semibold text-[#666055] shadow-sm transition-all hover:border-[#FF5E1A] hover:text-[#FF5E1A] hover:bg-[#FFF3EB] active:scale-[0.97]"
+            style={{ fontFamily: "'Poppins', sans-serif" }}
+            aria-label="About Creator"
+          >
+            <UserCircle2 size={15} className="transition-colors group-hover:text-[#FF5E1A]" />
+            <span className="hidden sm:inline">About</span>
+          </button>
+        </div>
+      </header>
 
       {/* Hero */}
       <section className="flex flex-col items-center pt-8 text-center sm:pt-14">
@@ -114,6 +151,18 @@ export function Landing({ onStart, onContinue, onSample }) {
             <Wand2 size={16} />
             Launch Resume Studio
           </Button>
+
+          {/* Import / Edit Existing CV Hero Button */}
+          <Button
+            size="lg"
+            variant="ghost"
+            onClick={() => setImportOpen(true)}
+            className="border border-[#E5E2DC] bg-white text-[#1A1A1A] hover:border-[#FF5E1A] hover:bg-[#FFF3EB] hover:text-[#FF5E1A] shadow-sm"
+          >
+            <FileUp size={16} className="text-[#FF5E1A]" />
+            Import / Edit Existing CV
+          </Button>
+
           {hasData ? (
             <Button variant="ghost" size="lg" onClick={onContinue}>
               Continue Editing <ArrowRight size={15} />
@@ -223,13 +272,24 @@ export function Landing({ onStart, onContinue, onSample }) {
           Your data is stored locally in your browser. Vector PDF downloads
           follow the strict [User_Name]-resume.pdf naming standard.
         </p>
-        <Button
-          size="lg"
-          onClick={onStart}
-          className="!bg-[#FF5E1A] hover:!bg-[#E04D0E] !text-white"
-        >
-          Open Live Studio <ArrowRight size={15} />
-        </Button>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Button
+            size="lg"
+            onClick={onStart}
+            className="!bg-[#FF5E1A] hover:!bg-[#E04D0E] !text-white"
+          >
+            Open Live Studio <ArrowRight size={15} />
+          </Button>
+          <Button
+            size="lg"
+            variant="ghost"
+            onClick={() => setImportOpen(true)}
+            className="border border-[#E5E2DC] bg-white text-[#1A1A1A] hover:border-[#FF5E1A] hover:bg-[#FFF3EB] hover:text-[#FF5E1A]"
+          >
+            <FileUp size={16} className="text-[#FF5E1A]" />
+            Import / Edit Existing CV
+          </Button>
+        </div>
       </section>
 
       <footer className="mt-12 text-center text-xs text-[#666055]">
@@ -239,8 +299,19 @@ export function Landing({ onStart, onContinue, onSample }) {
         </p>
       </footer>
 
-      {/* About Creator Modal */}
+      {/* Modals */}
       <AboutCreatorModal open={aboutOpen} onClose={() => setAboutOpen(false)} />
+      <ImportResumeModal
+        open={importOpen}
+        onClose={() => setImportOpen(false)}
+        onImportSuccess={handleImportSuccess}
+      />
+      <SavedResumesModal
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        onSelectResume={handleSelectResume}
+        onOpenImport={() => setImportOpen(true)}
+      />
     </div>
   );
 }

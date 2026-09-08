@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import {
   blankResume,
+  freshBasic,
   freshCertification,
   freshEducation,
   freshExperience,
@@ -11,8 +12,18 @@ import {
   freshSkillGroup,
   freshWebsite,
   defaultSectionOrder,
+  blankVisibility,
 } from '../lib/factory'
 import { sampleData } from '../lib/sample'
+import {
+  getActiveResumeId,
+  setActiveResumeId,
+  saveResumeRecord,
+  createResumeRecord,
+  getResumeById,
+  generateResumeTitle,
+  getResumeHistory,
+} from '../lib/resumeHistory'
 
 function shiftBy(arr, from, dir) {
   const j = from + dir
@@ -35,20 +46,20 @@ const FACTORY = {
 
 const patchItem = (arr, id, patch) => arr.map((it) => (it.id === id ? { ...it, ...patch } : it))
 
-/** Extract core data payload to push to history */
-function snapshotState(state) {
+/** Extract core data payload to push to history / storage */
+export function snapshotState(state) {
   return {
-    basic: JSON.parse(JSON.stringify(state.basic)),
-    experience: JSON.parse(JSON.stringify(state.experience)),
-    education: JSON.parse(JSON.stringify(state.education)),
+    basic: JSON.parse(JSON.stringify(state.basic || freshBasic())),
+    experience: JSON.parse(JSON.stringify(state.experience || [])),
+    education: JSON.parse(JSON.stringify(state.education || [])),
     websites: JSON.parse(JSON.stringify(state.websites || [])),
-    skillGroups: JSON.parse(JSON.stringify(state.skillGroups)),
+    skillGroups: JSON.parse(JSON.stringify(state.skillGroups || [])),
     hobbies: JSON.parse(JSON.stringify(state.hobbies || [])),
-    projects: JSON.parse(JSON.stringify(state.projects)),
-    certifications: JSON.parse(JSON.stringify(state.certifications)),
-    visibility: JSON.parse(JSON.stringify(state.visibility)),
+    projects: JSON.parse(JSON.stringify(state.projects || [])),
+    certifications: JSON.parse(JSON.stringify(state.certifications || [])),
+    visibility: JSON.parse(JSON.stringify(state.visibility || blankVisibility())),
     sectionOrder: JSON.parse(JSON.stringify(state.sectionOrder || defaultSectionOrder())),
-    templateId: state.templateId,
+    templateId: state.templateId || 'ats-studio',
     formatting: JSON.parse(JSON.stringify(state.formatting || freshFormatting())),
   }
 }
@@ -58,10 +69,66 @@ export const useResumeStore = create(
     (set, get) => ({
       ...blankResume(),
 
+      // Active resume metadata for multi-resume management
+      activeResumeId: null,
+      resumeTitle: 'Untitled Resume',
+      isSaving: false,
+      lastSavedAt: null,
+
       // History stacks for Undo / Redo
       history: [],
       future: [],
       activeItem: null, // { list, id } for floating action box
+
+      setResumeTitle: (title) => {
+        set({ resumeTitle: title })
+      },
+
+      setActiveResumeId: (id) => {
+        setActiveResumeId(id)
+        set({ activeResumeId: id })
+      },
+
+      loadResumeData: (record) => {
+        const data = record.data || record
+        const id = record.id || get().activeResumeId
+        const title = record.title || generateResumeTitle(data)
+        if (id) setActiveResumeId(id)
+        set({
+          activeResumeId: id,
+          resumeTitle: title,
+          basic: { ...freshBasic(), ...(data.basic || {}) },
+          experience: data.experience || [],
+          education: data.education || [],
+          websites: data.websites || [],
+          skillGroups: data.skillGroups || [],
+          hobbies: data.hobbies || [],
+          projects: data.projects || [],
+          certifications: data.certifications || [],
+          visibility: { ...blankVisibility(), ...(data.visibility || {}) },
+          sectionOrder: data.sectionOrder || defaultSectionOrder(),
+          templateId: data.templateId || 'ats-studio',
+          formatting: { ...freshFormatting(), ...(data.formatting || {}) },
+          history: [],
+          future: [],
+          activeItem: null,
+        })
+      },
+
+      newResume: (templateId = 'ats-studio') => {
+        const blank = blankResume()
+        blank.templateId = templateId
+        const record = createResumeRecord(blank, 'Untitled Resume')
+        set({
+          ...blank,
+          activeResumeId: record.id,
+          resumeTitle: record.title,
+          history: [],
+          future: [],
+          activeItem: null,
+        })
+        return record
+      },
 
       pushHistory: () => {
         const current = snapshotState(get())
@@ -257,9 +324,9 @@ export const useResumeStore = create(
       },
 
       // ---- import & backup ----------------------------------------------
-      importResume: (data) => {
+      importResume: (data, customTitle) => {
         get().pushHistory()
-        set({
+        const merged = {
           basic: { ...freshBasic(), ...(data.basic || {}) },
           experience: data.experience || [],
           education: data.education || [],
@@ -272,7 +339,19 @@ export const useResumeStore = create(
           sectionOrder: data.sectionOrder || defaultSectionOrder(),
           templateId: data.templateId || 'ats-studio',
           formatting: { ...freshFormatting(), ...(data.formatting || {}) },
+        }
+        const title = customTitle || generateResumeTitle(merged, 'Imported Resume')
+        const record = createResumeRecord(merged, title)
+        setActiveResumeId(record.id)
+        set({
+          ...merged,
+          activeResumeId: record.id,
+          resumeTitle: record.title,
+          history: [],
+          future: [],
+          activeItem: null,
         })
+        return record
       },
 
       // ---- meta ---------------------------------------------------------
@@ -280,13 +359,38 @@ export const useResumeStore = create(
       toggleSection: (key) =>
         set((s) => ({ visibility: { ...s.visibility, [key]: !s.visibility[key] } })),
 
-      resetAll: () => set(() => ({ ...blankResume(), history: [], future: [] })),
-      loadSample: () => set(() => ({ ...sampleData(), sectionOrder: defaultSectionOrder(), history: [], future: [] })),
+      resetAll: () => {
+        const blank = blankResume()
+        const record = createResumeRecord(blank, 'Blank Resume')
+        set(() => ({
+          ...blank,
+          activeResumeId: record.id,
+          resumeTitle: record.title,
+          history: [],
+          future: [],
+        }))
+        return record
+      },
+
+      loadSample: () => {
+        const sample = sampleData()
+        const initial = { ...sample, sectionOrder: defaultSectionOrder() }
+        const title = generateResumeTitle(initial, 'Sample Resume')
+        const record = createResumeRecord(initial, title)
+        set(() => ({
+          ...initial,
+          activeResumeId: record.id,
+          resumeTitle: title,
+          history: [],
+          future: [],
+        }))
+        return record
+      },
     }),
     {
       name: 'resume-io-studio-v2',
       partialize: (state) => {
-        const { history, future, activeItem, ...rest } = state
+        const { history, future, activeItem, isSaving, ...rest } = state
         return rest
       },
     }
@@ -294,4 +398,81 @@ export const useResumeStore = create(
 )
 
 export const hasResumeData = (state) =>
-  Boolean(state.basic.fullName.trim() || state.experience?.length || state.education?.length || state.projects?.length)
+  Boolean(state?.basic?.fullName?.trim() || state?.experience?.length || state?.education?.length || state?.projects?.length)
+
+// --- Auto-Save synchronization layer with localStorage ---
+let debounceTimer = null
+
+export function syncResumeToStorage(state) {
+  if (typeof window === 'undefined') return
+  let activeId = state.activeResumeId || getActiveResumeId()
+  const snapshot = snapshotState(state)
+
+  // Avoid creating records if completely empty blank initial mount
+  if (!activeId && !hasResumeData(state)) return
+
+  const title = state.resumeTitle?.trim() || generateResumeTitle(snapshot)
+
+  if (!activeId) {
+    const newRec = createResumeRecord(snapshot, title)
+    useResumeStore.setState({ activeResumeId: newRec.id, resumeTitle: newRec.title })
+    return newRec
+  }
+
+  return saveResumeRecord({
+    id: activeId,
+    title,
+    data: snapshot,
+  })
+}
+
+// Auto-seed/migrate existing state into resume history if history is currently empty
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    const history = getResumeHistory()
+    const current = useResumeStore.getState()
+    if (history.length === 0 && hasResumeData(current)) {
+      const initialRecord = createResumeRecord(snapshotState(current), current.resumeTitle || generateResumeTitle(current))
+      useResumeStore.setState({ activeResumeId: initialRecord.id, resumeTitle: initialRecord.title })
+    } else if (history.length > 0) {
+      const activeId = getActiveResumeId()
+      if (activeId) {
+        const rec = getResumeById(activeId)
+        if (rec && !current.activeResumeId) {
+          useResumeStore.getState().loadResumeData(rec)
+        }
+      }
+    }
+  }, 100)
+}
+
+// Subscribe to store updates to auto-save to history with debouncing
+useResumeStore.subscribe((state, prevState) => {
+  // Only auto-save if meaningful resume content changed
+  if (state.isSaving !== prevState.isSaving) return
+
+  // Check if core data or title changed
+  const dataChanged =
+    state.basic !== prevState.basic ||
+    state.experience !== prevState.experience ||
+    state.education !== prevState.education ||
+    state.websites !== prevState.websites ||
+    state.skillGroups !== prevState.skillGroups ||
+    state.hobbies !== prevState.hobbies ||
+    state.projects !== prevState.projects ||
+    state.certifications !== prevState.certifications ||
+    state.visibility !== prevState.visibility ||
+    state.sectionOrder !== prevState.sectionOrder ||
+    state.templateId !== prevState.templateId ||
+    state.formatting !== prevState.formatting ||
+    state.resumeTitle !== prevState.resumeTitle
+
+  if (!dataChanged) return
+
+  if (debounceTimer) clearTimeout(debounceTimer)
+  debounceTimer = setTimeout(() => {
+    const currentState = useResumeStore.getState()
+    syncResumeToStorage(currentState)
+    useResumeStore.setState({ isSaving: false, lastSavedAt: Date.now() })
+  }, 400)
+})

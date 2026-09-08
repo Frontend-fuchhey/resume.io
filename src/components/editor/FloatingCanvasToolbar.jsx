@@ -1,4 +1,4 @@
-import { Download, Redo2, Undo2 } from 'lucide-react'
+import { Download, FileUp, FolderOpen, Redo2, Undo2 } from 'lucide-react'
 import { useState } from 'react'
 import { useResumeStore } from '../../store/useResumeStore'
 import { toast } from '../../store/useUIStore'
@@ -10,6 +10,8 @@ export function FloatingCanvasToolbar({
   zoomOptions = ['32%', '50%', '75%', '100%', 'Fit'],
   onDownload,
   isDownloading: externalIsDownloading,
+  onOpenImport,
+  onOpenHistory,
 }) {
   const history = useResumeStore((s) => s.history || [])
   const future = useResumeStore((s) => s.future || [])
@@ -30,7 +32,6 @@ export function FloatingCanvasToolbar({
     }
     setInternalDownloading(true)
     try {
-      // Micro-delay (~100-200ms) ensuring DOM repaint and state transitions finish
       await new Promise((resolve) => setTimeout(resolve, 150))
       const resume = useResumeStore.getState()
       const filename = await exportResumePdf(resume)
@@ -70,7 +71,7 @@ export function FloatingCanvasToolbar({
 
       <div className="mx-1 h-3.5 w-px bg-[#E8E4DC]" />
 
-      {/* Zoom Dropdown with 32% default or selector */}
+      {/* Zoom Dropdown */}
       <div className="relative flex items-center">
         <select
           value={zoom}
@@ -89,6 +90,33 @@ export function FloatingCanvasToolbar({
 
       <div className="mx-1 h-3.5 w-px bg-[#E8E4DC]" />
 
+      {/* Import & History buttons */}
+      {onOpenImport && (
+        <button
+          type="button"
+          onClick={onOpenImport}
+          title="Import / Edit Existing CV (.pdf, .docx)"
+          className="flex items-center gap-1 text-[#1A1A1A] hover:text-[#FF5E1A] text-xs font-semibold px-2 py-1 rounded-full hover:bg-[#FFF3EB] transition-colors"
+        >
+          <FileUp size={13} className="text-[#FF5E1A]" />
+          <span className="hidden sm:inline">Import</span>
+        </button>
+      )}
+
+      {onOpenHistory && (
+        <button
+          type="button"
+          onClick={onOpenHistory}
+          title="My Resumes / Saved History"
+          className="flex items-center gap-1 text-[#1A1A1A] hover:text-[#FF5E1A] text-xs font-semibold px-2 py-1 rounded-full hover:bg-[#FFF3EB] transition-colors"
+        >
+          <FolderOpen size={13} className="text-[#FF5E1A]" />
+          <span className="hidden sm:inline">My Resumes</span>
+        </button>
+      )}
+
+      <div className="mx-1 h-3.5 w-px bg-[#E8E4DC]" />
+
       {/* Primary Download PDF Action */}
       <button
         type="button"
@@ -102,4 +130,3 @@ export function FloatingCanvasToolbar({
     </div>
   )
 }
-
