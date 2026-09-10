@@ -65,7 +65,7 @@ function ExperienceItem(props) {
       layout
       dragListener={false}
       dragControls={controls}
-      className="rounded-xl border border-[#E8E4DC] bg-white p-6 overflow-hidden shadow-card"
+      className="rounded-xl border border-[#E8E4DC] bg-white p-4 overflow-hidden shadow-card"
     >
       <ExperienceCard {...props} controls={controls} />
     </Reorder.Item>
@@ -132,7 +132,6 @@ function ExperienceCard({ item, index, total, onPatch, onRemove, onMove, onBulle
           <TextInput
             value={item.role || ''}
             onChange={(e) => onPatch({ role: e.target.value })}
-            placeholder="e.g. Senior Software Engineer"
             compact
           />
         </Field>
@@ -140,7 +139,6 @@ function ExperienceCard({ item, index, total, onPatch, onRemove, onMove, onBulle
           <TextInput
             value={item.company || ''}
             onChange={(e) => onPatch({ company: e.target.value })}
-            placeholder="e.g. Acme Corporation"
             compact
           />
         </Field>
@@ -148,7 +146,6 @@ function ExperienceCard({ item, index, total, onPatch, onRemove, onMove, onBulle
           <TextInput
             value={item.location || ''}
             onChange={(e) => onPatch({ location: e.target.value })}
-            placeholder="e.g. New York, NY (Hybrid)"
             compact
           />
         </Field>
@@ -208,7 +205,6 @@ function ExperienceCard({ item, index, total, onPatch, onRemove, onMove, onBulle
                 value={b}
                 rows={2}
                 onChange={(e) => updateBullet(i, e.target.value)}
-                placeholder="e.g. Spearheaded frontend refactoring reducing latency by 35%…"
                 className="w-full rounded-lg border border-[#E8E4DC] bg-white px-2.5 py-1.5 text-xs text-[#1A1A1A] leading-relaxed placeholder:text-[#9E988E] hover:border-[#D6D0C5] focus:border-[#FF5E1A] focus:outline-none focus:ring-1 focus:ring-[#FF5E1A]/20"
               />
               <button

@@ -204,7 +204,6 @@ export function EditableLink({
                   type="text"
                   value={draftLabel}
                   onChange={(e) => handleLabelChange(e.target.value)}
-                  placeholder="e.g. GitHub, LinkedIn, Portfolio"
                   className="w-full rounded-md border border-[#E8E4DC] bg-[#FBF9F5] px-2.5 py-1.5 text-xs text-[#1A1A1A] placeholder:text-[#9E988E] focus:border-[#244CEC] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#244CEC]"
                 />
               </div>
@@ -224,7 +223,6 @@ export function EditableLink({
                   onKeyDown={(e) => {
                     if (e.key === 'Enter') handleDone(e)
                   }}
-                  placeholder="e.g. https://github.com/username"
                   className="w-full rounded-md border border-[#E8E4DC] bg-[#FBF9F5] pl-8 pr-2.5 py-1.5 text-xs font-mono text-[#1A1A1A] placeholder:text-[#9E988E] focus:border-[#244CEC] focus:bg-white focus:outline-none focus:ring-1 focus:ring-[#244CEC]"
                 />
               </div>

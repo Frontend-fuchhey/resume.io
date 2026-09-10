@@ -50,15 +50,15 @@ function ProjectRow({ item, index, total, onPatch, onRemove, onMove }) {
     <RowShell controls={controls} index={index} total={total} onMove={onMove} onRemove={onRemove} item={item}>
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
         <Field label="Project Title">
-          <TextInput value={item.name} onChange={(e) => onPatch({ name: e.target.value })} placeholder="e.g. Marketing Campaign, Brand Redesign, E-commerce Website, Research Study" compact />
+          <TextInput value={item.name} onChange={(e) => onPatch({ name: e.target.value })} compact />
         </Field>
         <Field label="Project / Portfolio Link">
-          <TextInput value={item.link} onChange={(e) => onPatch({ link: e.target.value })} placeholder="e.g. link-to-project.com, drive/folder, behance.net/design" compact />
+          <TextInput value={item.link} onChange={(e) => onPatch({ link: e.target.value })} compact />
         </Field>
       </div>
       <div className="mt-2">
         <Field label="Description">
-          <TextArea value={item.description} onChange={(e) => onPatch({ description: e.target.value })} rows={2} placeholder="e.g. Led cross-functional team, designed marketing assets, increased traffic by 30%, or published research findings..." compact />
+          <TextArea value={item.description} onChange={(e) => onPatch({ description: e.target.value })} rows={2} compact />
         </Field>
       </div>
     </RowShell>
@@ -73,13 +73,13 @@ function CertRow({ item, index, total, onPatch, onRemove, onMove }) {
     <RowShell controls={controls} index={index} total={total} onMove={onMove} onRemove={onRemove} item={item}>
       <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-[1fr_1fr_90px]">
         <Field label="Certification">
-          <TextInput value={item.name} onChange={(e) => onPatch({ name: e.target.value })} placeholder="AWS Certified Developer" compact />
+          <TextInput value={item.name} onChange={(e) => onPatch({ name: e.target.value })} compact />
         </Field>
         <Field label="Issuer">
-          <TextInput value={item.issuer} onChange={(e) => onPatch({ issuer: e.target.value })} placeholder="Amazon Web Services" compact />
+          <TextInput value={item.issuer} onChange={(e) => onPatch({ issuer: e.target.value })} compact />
         </Field>
         <Field label="Year">
-          <TextInput value={item.year} onChange={(e) => onPatch({ year: e.target.value })} placeholder="2024" compact />
+          <TextInput value={item.year} onChange={(e) => onPatch({ year: e.target.value })} compact />
         </Field>
       </div>
     </RowShell>
@@ -91,9 +91,9 @@ function CertRow({ item, index, total, onPatch, onRemove, onMove }) {
 function RowShell({ item, index, total, controls, onMove, onRemove, children }) {
   const isProject = Boolean(item && item.name !== undefined)
   const icon = isProject ? (
-    <FolderGit2 size={14} className="text-cyan-500/80 dark:text-cyan-400/70" />
+    <FolderGit2 size={14} className="text-[#FF5E1A]" />
   ) : (
-    <Award size={14} className="text-amber-500/90 dark:text-amber-400/80" />
+    <Award size={14} className="text-[#FF5E1A]" />
   )
   const fallback = isProject ? 'Project' : 'Certification'
   return (
@@ -102,12 +102,12 @@ function RowShell({ item, index, total, controls, onMove, onRemove, children }) 
       layout
       dragListener={false}
       dragControls={controls}
-      className="rounded-xl border border-slate-200/80 bg-white/70 p-3 dark:border-white/[0.07] dark:bg-white/[0.025]"
+      className="rounded-xl border border-[#E8E4DC] bg-white p-3.5 shadow-card"
     >
-      <div className="mb-2 flex items-center gap-1.5">
+      <div className="mb-2 flex items-center gap-2">
         <DragGrip controls={controls} />
         {icon}
-        <p className="min-w-0 flex-1 truncate text-[13px] font-bold text-slate-700 dark:text-slate-200">
+        <p className="min-w-0 flex-1 truncate text-xs font-semibold text-[#1A1A1A]">
           {item.name || `${fallback} ${index + 1}`}
         </p>
         <ArrowButton title="Move up" disabled={index === 0} onClick={() => onMove(-1)}>
@@ -127,19 +127,25 @@ function Collection({ items, reorder, onAdd, empty, addLabel, renderItem }) {
   return (
     <div className="space-y-3">
       {items.length === 0 ? (
-        <div className="flex flex-col items-center gap-3 rounded-xl border-2 border-dashed border-slate-300/80 p-6 text-center dark:border-white/15">
-          <p className="text-sm text-slate-500 dark:text-slate-400">{empty}</p>
-          <button onClick={onAdd} className="btn-ghost border-dashed !text-xs text-slate-500 dark:text-slate-400">
-            <Plus size={14} /> {addLabel}
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={onAdd}
+          className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-[#E8E4DC] bg-white/60 py-6 text-sm font-medium text-[#666055] hover:border-[#FF5E1A]/60 hover:bg-[#FFF3EB]/50 hover:text-[#FF5E1A] transition-all"
+        >
+          <Plus size={16} className="text-[#FF5E1A]" />
+          {addLabel}
+        </button>
       ) : (
         <>
           <Reorder.Group axis="y" values={items} onReorder={reorder} className="space-y-2.5">
             {items.map((item, i) => renderItem(item, i, items.length))}
           </Reorder.Group>
-          <button onClick={onAdd} className="btn-ghost w-full border-dashed !py-2 text-slate-500 dark:text-slate-400">
-            <Plus size={14} /> {addLabel}
+          <button
+            type="button"
+            onClick={onAdd}
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-dashed border-[#E8E4DC] bg-white py-2.5 text-xs font-semibold text-[#666055] hover:border-[#FF5E1A]/70 hover:bg-[#FFF3EB]/40 hover:text-[#FF5E1A] transition-colors"
+          >
+            <Plus size={14} /> + {addLabel}
           </button>
         </>
       )}
@@ -150,8 +156,9 @@ function Collection({ items, reorder, onAdd, empty, addLabel, renderItem }) {
 export function DragGrip({ controls }) {
   return (
     <button
+      type="button"
       onPointerDown={(e) => controls.start(e)}
-      className="cursor-grab touch-none rounded p-0.5 text-slate-300 hover:text-cyan-400 active:cursor-grabbing dark:text-slate-600 dark:hover:text-cyan-300"
+      className="cursor-grab touch-none rounded p-0.5 text-[#B5AFA6] hover:text-[#1A1A1A] active:cursor-grabbing"
       aria-label="Drag to reorder"
     >
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">

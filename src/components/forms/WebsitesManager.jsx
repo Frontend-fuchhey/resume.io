@@ -34,7 +34,6 @@ export function WebsitesManager() {
                     <TextInput
                       value={w.label || ''}
                       onChange={(e) => update(w.id, { label: e.target.value })}
-                      placeholder="e.g. LinkedIn / Portfolio / GitHub"
                       compact
                     />
                   </Field>
@@ -42,7 +41,6 @@ export function WebsitesManager() {
                     <TextInput
                       value={w.url || ''}
                       onChange={(e) => update(w.id, { url: e.target.value })}
-                      placeholder="e.g. https://linkedin.com/in/username"
                       compact
                     />
                     {w.url && (

@@ -107,24 +107,24 @@ export function BasicForm() {
 
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Full Name *" hint="Strictly drives the PDF file name">
-          <TextInput placeholder="e.g. David St. Peter" {...P('fullName')} />
+          <TextInput {...P('fullName')} />
         </Field>
         <Field label="Job Title / Headline">
-          <TextInput placeholder="e.g. Senior Frontend Engineer" {...P('jobTitle')} />
+          <TextInput {...P('jobTitle')} />
         </Field>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Email Address">
-          <TextInput type="email" placeholder="e.g. david.stpeter@example.com" {...P('email')} />
+          <TextInput type="email" {...P('email')} />
         </Field>
         <Field label="Phone Number">
-          <TextInput type="tel" placeholder="e.g. +1 (555) 234-5678" {...P('phone')} />
+          <TextInput type="tel" {...P('phone')} />
         </Field>
       </div>
 
       <Field label="Location">
-        <TextInput placeholder="e.g. San Francisco, CA" {...P('location')} />
+        <TextInput {...P('location')} />
       </Field>
     </div>
   )

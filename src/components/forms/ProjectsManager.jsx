@@ -125,7 +125,6 @@ function ProjectCard({ item, index, total, onPatch, onRemove, onMove, controls }
           <TextInput
             value={item.title || item.name || ''}
             onChange={(e) => onPatch({ title: e.target.value, name: e.target.value })}
-            placeholder="e.g. Marketing Campaign, Brand Redesign, E-commerce Website, Research Study"
             compact
           />
         </Field>
@@ -134,7 +133,6 @@ function ProjectCard({ item, index, total, onPatch, onRemove, onMove, controls }
           <TextInput
             value={item.link || ''}
             onChange={(e) => onPatch({ link: e.target.value })}
-            placeholder="e.g. link-to-project.com, drive/folder, behance.net/design"
             compact
           />
         </Field>
@@ -143,7 +141,6 @@ function ProjectCard({ item, index, total, onPatch, onRemove, onMove, controls }
           <TextInput
             value={item.techStack || ''}
             onChange={(e) => onPatch({ techStack: e.target.value })}
-            placeholder="e.g. Photoshop, Figma, Excel, SEO, Project Management, React"
             compact
           />
         </Field>
@@ -166,7 +163,6 @@ function ProjectCard({ item, index, total, onPatch, onRemove, onMove, controls }
             rows={3}
             value={item.description || ''}
             onChange={(e) => onPatch({ description: e.target.value })}
-            placeholder="e.g. Led cross-functional team, designed marketing assets, increased traffic by 30%, or published research findings..."
             className="w-full rounded-lg border border-[#E8E4DC] bg-white px-2.5 py-2 text-xs text-[#1A1A1A] leading-relaxed placeholder:text-[#9E988E] hover:border-[#D6D0C5] focus:border-[#FF5E1A] focus:outline-none focus:ring-1 focus:ring-[#FF5E1A]/20"
           />
         </div>

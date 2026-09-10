@@ -36,7 +36,6 @@ export function SkillsManager() {
                   <TextInput
                     value={g.label || ''}
                     onChange={(e) => rename(g.id, e.target.value)}
-                    placeholder="Category (e.g. Technical Skills, Leadership)"
                     compact
                     className="flex-1 font-medium text-xs"
                   />
@@ -106,7 +105,6 @@ function SkillPill({ value, onChange, onRemove }) {
           onChange(e.target.value)
           setWidth(Math.max(8, e.target.value.length + 3))
         }}
-        placeholder="e.g. React"
         spellCheck={false}
         className="bg-transparent py-0.5 text-xs text-[#1A1A1A] outline-none placeholder:text-[#9E988E]"
         style={{ width: `${width}ch` }}

@@ -7,7 +7,7 @@ import { cn } from '../../lib/utils'
  * Generic editor for an array of short strings (achievement bullets,
  * skill tags). Reusable everywhere: wizard, side panel, inline.
  */
-export function EditableList({ items, onChange, placeholder, addLabel, marker = '•', className, inputClass }) {
+export function EditableList({ items, onChange, addLabel, marker = '•', className, inputClass }) {
   const [focusIdx, setFocusIdx] = useState(null)
   const refs = useRef({})
 
@@ -69,7 +69,6 @@ export function EditableList({ items, onChange, placeholder, addLabel, marker = 
             value={value}
             onChange={(e) => commit(i, e.target.value)}
             onKeyDown={(e) => onKey(e, i)}
-            placeholder={placeholder}
             aria-label={`Line ${i + 1}`}
             className={cn('flex-1 px-2.5 py-1.5 text-[13px] leading-snug', inputClass)}
           />

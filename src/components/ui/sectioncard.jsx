@@ -9,6 +9,7 @@ export function SectionCard({
   iconColor = 'text-[#FF5E1A]',
   title,
   subtitle,
+  badge,
   actions,
   children,
   defaultOpen = false,
@@ -16,35 +17,44 @@ export function SectionCard({
   const [open, setOpen] = useState(defaultOpen)
 
   return (
-    <div className="overflow-hidden rounded-xl border border-[#E8E4DC] bg-white shadow-card transition-all">
+    <div className="overflow-hidden rounded-xl border border-[#E8E4DC] bg-white shadow-xs transition-all hover:border-[#D6D0C5]">
       <div
         onClick={() => setOpen((o) => !o)}
         className="flex cursor-pointer items-center justify-between px-3.5 py-3 select-none hover:bg-[#FBF9F5] transition-colors"
       >
         <div className="flex items-center gap-2.5 min-w-0">
           {Icon && (
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#F5F2EC] text-[#1A1A1A]">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#FFF3EB] text-[#FF5E1A]">
               <Icon size={14} className={iconColor} />
             </div>
           )}
           <div className="min-w-0">
-            <h3 className="truncate text-xs font-semibold text-[#1A1A1A]">{title}</h3>
-            {subtitle && <p className="truncate text-[10.5px] text-[#666055]">{subtitle}</p>}
+            <div className="flex items-center gap-2">
+              <h3 className="truncate text-xs font-bold text-[#1A1A1A]">{title}</h3>
+              {badge !== undefined && badge !== null && (
+                <span className="rounded-full bg-[#F5F2EC] px-1.5 py-0.2 text-[9.5px] font-semibold text-[#666055]">
+                  {badge}
+                </span>
+              )}
+            </div>
+            {subtitle && <p className="truncate text-[10.5px] text-[#8C857B]">{subtitle}</p>}
           </div>
         </div>
 
-        <div className="flex items-center gap-2" onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center gap-1.5" onClick={(e) => e.stopPropagation()}>
           {actions}
           <button
             type="button"
             onClick={() => setOpen((o) => !o)}
             aria-label={open ? 'Collapse section' : 'Expand section'}
             className={cn(
-              'flex h-6 w-6 items-center justify-center rounded-full border border-[#E8E4DC] bg-white text-[#666055] transition-transform duration-200 hover:border-[#FF5E1A] hover:text-[#FF5E1A]',
-              open ? 'rotate-45 bg-[#FFF3EB] border-[#FF5E1A]/40 text-[#FF5E1A]' : 'rotate-0'
+              'flex h-6 w-6 items-center justify-center rounded-lg border border-[#E8E4DC] bg-white text-[#666055] transition-all duration-200 hover:border-[#FF5E1A] hover:text-[#FF5E1A]',
+              open ? 'rotate-180 bg-[#FBF9F5] text-[#1A1A1A]' : 'rotate-0'
             )}
           >
-            <Plus size={13} strokeWidth={2.4} />
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
           </button>
         </div>
       </div>

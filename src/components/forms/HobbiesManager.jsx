@@ -31,7 +31,6 @@ export function HobbiesManager() {
                 <TextInput
                   value={h.name || ''}
                   onChange={(e) => update(h.id, { name: e.target.value })}
-                  placeholder="e.g. Open-source maintainer, Chess, Mountain hiking"
                   compact
                   className="flex-1"
                 />

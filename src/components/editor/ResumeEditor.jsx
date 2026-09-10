@@ -1,5 +1,6 @@
 import { Reorder, useDragControls } from 'framer-motion'
 import {
+  Award,
   Briefcase,
   ChevronDown,
   ChevronUp,
@@ -20,6 +21,7 @@ import { EducationManager } from '../forms/EducationManager'
 import { WebsitesManager } from '../forms/WebsitesManager'
 import { SkillsManager } from '../forms/SkillsManager'
 import { HobbiesManager } from '../forms/HobbiesManager'
+import { CertsManager } from '../forms/ProjectsCertsManager'
 import { SectionCard, VisibilityToggle } from '../ui/sectioncard'
 import { useResumeStore } from '../../store/useResumeStore'
 import { defaultSectionOrder } from '../../lib/factory'
@@ -32,6 +34,7 @@ const SECTION_CONFIGS = {
     defaultOpen: true,
     Component: SummaryForm,
     hasVisibility: false,
+    getBadge: (s) => (s.basic?.summary?.trim() ? '1' : null),
   },
   experience: {
     icon: Briefcase,
@@ -40,6 +43,7 @@ const SECTION_CONFIGS = {
     defaultOpen: true,
     Component: ExperienceManager,
     hasVisibility: true,
+    getBadge: (s) => (s.experience?.length ? `${s.experience.length}` : null),
   },
   education: {
     icon: GraduationCap,
@@ -48,6 +52,7 @@ const SECTION_CONFIGS = {
     defaultOpen: false,
     Component: EducationManager,
     hasVisibility: true,
+    getBadge: (s) => (s.education?.length ? `${s.education.length}` : null),
   },
   projects: {
     icon: FolderGit2,
@@ -56,6 +61,16 @@ const SECTION_CONFIGS = {
     defaultOpen: false,
     Component: ProjectsManager,
     hasVisibility: true,
+    getBadge: (s) => (s.projects?.length ? `${s.projects.length}` : null),
+  },
+  certifications: {
+    icon: Award,
+    title: 'Certifications',
+    subtitle: 'Licenses, credentials & specialized certificates',
+    defaultOpen: false,
+    Component: CertsManager,
+    hasVisibility: true,
+    getBadge: (s) => (s.certifications?.length ? `${s.certifications.length}` : null),
   },
   websites: {
     icon: Globe,
@@ -64,6 +79,7 @@ const SECTION_CONFIGS = {
     defaultOpen: false,
     Component: WebsitesManager,
     hasVisibility: true,
+    getBadge: (s) => (s.websites?.length ? `${s.websites.length}` : null),
   },
   skills: {
     icon: Tag,
@@ -72,6 +88,10 @@ const SECTION_CONFIGS = {
     defaultOpen: false,
     Component: SkillsManager,
     hasVisibility: true,
+    getBadge: (s) => {
+      const count = (s.skillGroups || []).reduce((acc, g) => acc + (g.items?.length || 0), 0)
+      return count ? `${count}` : null
+    },
   },
   hobbies: {
     icon: Heart,
@@ -80,6 +100,7 @@ const SECTION_CONFIGS = {
     defaultOpen: false,
     Component: HobbiesManager,
     hasVisibility: true,
+    getBadge: (s) => (s.hobbies?.length ? `${s.hobbies.length}` : null),
   },
 }
 
@@ -89,6 +110,7 @@ function ReorderableSectionItem({
   total,
   config,
   visibility,
+  badge,
   toggle,
   moveSection,
 }) {
@@ -106,9 +128,10 @@ function ReorderableSectionItem({
         icon={Icon}
         title={title}
         subtitle={subtitle}
+        badge={badge}
         defaultOpen={defaultOpen}
         actions={
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5">
             {/* Drag Handle */}
             <button
               type="button"
@@ -160,11 +183,12 @@ function ReorderableSectionItem({
 }
 
 export function ResumeEditor() {
-  const visibility = useResumeStore((s) => s.visibility || {})
-  const toggle = useResumeStore((s) => s.toggleSection)
-  const sectionOrder = useResumeStore((s) => s.sectionOrder || defaultSectionOrder())
-  const reorderSections = useResumeStore((s) => s.reorderSections)
-  const moveSection = useResumeStore((s) => s.moveSection)
+  const store = useResumeStore()
+  const visibility = store.visibility || {}
+  const toggle = store.toggleSection
+  const sectionOrder = store.sectionOrder || defaultSectionOrder()
+  const reorderSections = store.reorderSections
+  const moveSection = store.moveSection
 
   // Ensure all configured keys exist in the list
   const validKeys = Object.keys(SECTION_CONFIGS)
@@ -194,6 +218,7 @@ export function ResumeEditor() {
         icon={User}
         title="Personal Information"
         subtitle="Name, photo, title & contact coordinates"
+        badge={store.basic?.fullName ? 'Complete' : null}
         defaultOpen={true}
       >
         <BasicForm />
@@ -209,6 +234,7 @@ export function ResumeEditor() {
         {activeOrder.map((key, index) => {
           const config = SECTION_CONFIGS[key]
           if (!config) return null
+          const badge = config.getBadge ? config.getBadge(store) : null
           return (
             <ReorderableSectionItem
               key={key}
@@ -217,6 +243,7 @@ export function ResumeEditor() {
               total={activeOrder.length}
               config={config}
               visibility={visibility}
+              badge={badge}
               toggle={toggle}
               moveSection={moveSection}
             />

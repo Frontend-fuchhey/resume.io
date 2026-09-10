@@ -27,7 +27,6 @@ export function SummaryForm() {
           rows={4}
           value={summary}
           onChange={(e) => setBasic({ summary: e.target.value })}
-          placeholder="e.g. Lead Engineer with 7+ years of experience scaling distributed systems and web platforms…"
           className="font-sans text-sm leading-relaxed"
         />
       </Field>

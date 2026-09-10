@@ -9,12 +9,14 @@ import {
   Phone,
   Tag,
   User,
+  Award,
 } from 'lucide-react'
 import { useResumeStore } from '../../../store/useResumeStore'
 import { dateRange, cleanUrl, toHref } from '../../../lib/format'
 import { EditableText } from '../EditableText'
 import { EditableLink } from '../EditableLink'
 import { EditableDate } from '../EditableDate'
+import { Bullet, AddBulletButton } from '../Bullet'
 
 const FONT_MAP = {
   Poppins: "'Poppins', sans-serif",
@@ -39,9 +41,10 @@ export default function AtsStudioTemplate({ resume, theme }) {
   const skillGroups = resume.skillGroups || []
   const hobbies = resume.hobbies || []
   const projects = resume.projects || []
+  const certifications = resume.certifications || []
   const visibility = resume.visibility || {}
   const formatting = resume.formatting || {}
-  const sectionOrder = resume.sectionOrder || ['summary', 'experience', 'education', 'projects', 'websites', 'skills', 'hobbies']
+  const sectionOrder = resume.sectionOrder || ['summary', 'experience', 'education', 'projects', 'certifications', 'websites', 'skills', 'hobbies']
   const sectionTitles = resume.sectionTitles || {}
 
   const setActiveItem = useResumeStore((s) => s.setActiveItem)
@@ -69,6 +72,7 @@ export default function AtsStudioTemplate({ resume, theme }) {
   const hasEducation = visibility.education !== false && education.length > 0
   const hasSkills = visibility.skills !== false && skillGroups.length > 0
   const hasHobbies = visibility.hobbies !== false && hobbies.length > 0
+  const hasCertifications = visibility.certifications !== false && certifications.length > 0
   const hasSummary = basic.summary && basic.summary.trim()
   const hasExperience = visibility.experience !== false && experience.length > 0
   const hasProjects = visibility.projects !== false && projects.length > 0
@@ -395,22 +399,19 @@ export default function AtsStudioTemplate({ resume, theme }) {
             </div>
 
             {/* Achievements / Bullets */}
-            {exp.bullets && exp.bullets.length > 0 && (
-              <ul className="mt-2 space-y-1 text-[9pt] text-[#2D2D2D]">
-                {exp.bullets.map((bullet, idx) => (
-                  <li key={idx} className="resume-block flex items-start gap-1.5 leading-snug">
-                    <span className="mt-1 text-[8pt] select-none shrink-0" style={{ color: accentColor }}>•</span>
-                    <EditableText
-                      multiline
-                      value={bullet}
-                      onChange={(val) => updateBullet(exp.id, idx, val)}
-                      placeholder="Add achievement with quantified metrics..."
-                      className="flex-1"
-                    />
-                  </li>
-                ))}
-              </ul>
-            )}
+            <div className="mt-2 space-y-1 text-[9pt] text-[#2D2D2D]">
+              {(exp.bullets || []).map((bullet, idx) => (
+                <Bullet
+                  key={idx}
+                  expId={exp.id}
+                  index={idx}
+                  text={bullet}
+                  marker="•"
+                  markerStyle={{ color: accentColor }}
+                />
+              ))}
+              <AddBulletButton expId={exp.id} />
+            </div>
           </div>
         ))}
       </div>
@@ -486,11 +487,54 @@ export default function AtsStudioTemplate({ resume, theme }) {
     </section>
   )
 
+  const renderCertifications = () => (
+    <section key="certifications" className="resume-block">
+      <h2
+        className="text-[10pt] font-bold uppercase tracking-wider"
+        style={{ color: accentColor }}
+      >
+        <EditableText
+          value={sectionTitles.certifications || 'Certifications'}
+          onChange={(val) => setSectionTitle('certifications', val)}
+          placeholder="Certifications"
+        />
+      </h2>
+      <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-1.5 opacity-40" />
+      <div className="space-y-2">
+        {certifications.map((c) => (
+          <div key={c.id} className="resume-block text-[8.5pt]">
+            <div className="font-bold text-[#1A1A1A]">
+              <EditableText
+                value={c.name}
+                onChange={(val) => updateItem('certifications', c.id, { name: val })}
+                placeholder="Certification Name"
+              />
+            </div>
+            <div className="text-[#666055] flex items-center gap-1.5">
+              <EditableText
+                value={c.issuer}
+                onChange={(val) => updateItem('certifications', c.id, { issuer: val })}
+                placeholder="Issuer"
+              />
+              {c.year && <span>·</span>}
+              <EditableText
+                value={c.year}
+                onChange={(val) => updateItem('certifications', c.id, { year: val })}
+                placeholder="Year"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+
   // Map section keys to their render functions
   const SECTION_MAP = {
     websites: { hasContent: hasContact, render: renderContactAndWebsites, side: 'left' },
     education: { hasContent: hasEducation, render: renderEducation, side: 'left' },
     skills: { hasContent: hasSkills, render: renderSkills, side: 'left' },
+    certifications: { hasContent: hasCertifications, render: renderCertifications, side: 'left' },
     hobbies: { hasContent: hasHobbies, render: renderHobbies, side: 'left' },
     summary: { hasContent: hasSummary || basic.summary === '', render: renderSummary, side: 'right' },
     experience: { hasContent: hasExperience, render: renderExperience, side: 'right' },

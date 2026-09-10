@@ -93,7 +93,6 @@ function EduRow(props) {
           <TextInput
             value={item.degree || ''}
             onChange={(e) => onPatch({ degree: e.target.value })}
-            placeholder="e.g. B.S. in Computer Science"
             compact
           />
         </Field>
@@ -101,7 +100,6 @@ function EduRow(props) {
           <TextInput
             value={item.school || ''}
             onChange={(e) => onPatch({ school: e.target.value })}
-            placeholder="e.g. Stanford University"
             compact
           />
         </Field>
@@ -109,7 +107,6 @@ function EduRow(props) {
           <TextInput
             value={item.gradYear || ''}
             onChange={(e) => onPatch({ gradYear: e.target.value })}
-            placeholder="e.g. 2022"
             compact
           />
         </Field>
@@ -117,7 +114,6 @@ function EduRow(props) {
           <TextInput
             value={item.focus || ''}
             onChange={(e) => onPatch({ focus: e.target.value })}
-            placeholder="e.g. Magna Cum Laude · 3.9 GPA"
             compact
           />
         </Field>

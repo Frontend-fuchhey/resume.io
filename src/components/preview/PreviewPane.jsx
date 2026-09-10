@@ -125,15 +125,17 @@ export function PreviewPane({ onDownload, isDownloading, onOpenImport, onOpenHis
         ref={wrapRef}
         className="studio-grid relative min-h-0 flex-1 overflow-auto p-8 pt-16"
       >
-        {overflows && (
-          <div className="sticky top-2 z-10 mx-auto mb-3 flex items-center gap-2 rounded-full border border-amber-300 bg-amber-50/95 px-3.5 py-1 text-[11px] font-medium text-amber-800 shadow-sm backdrop-blur-xs">
-            <span className="flex h-2 w-2 rounded-full bg-amber-500 animate-pulse" />
-            <span>
-              Content spans <strong>{pageCount} pages</strong> ({isLetter ? 'US Letter' : 'A4 Standard'}).
-              Use <em>Compact</em> margin density or adjust spacing to keep single-page ATS.
-            </span>
-          </div>
-        )}
+        <div className="sticky top-2 z-10 mx-auto mb-4 flex items-center gap-2 rounded-full border border-[#E8E4DC] bg-white/95 px-3.5 py-1 text-[11px] font-medium text-[#403D39] shadow-sm backdrop-blur-xs">
+          <span className={`flex h-2 w-2 rounded-full ${pageCount > 1 ? 'bg-[#FF5E1A]' : 'bg-emerald-500'}`} />
+          <span>
+            <strong>{pageCount} {pageCount === 1 ? 'Page' : 'Pages'}</strong> · {isLetter ? 'US Letter' : 'A4 Standard'}
+            {pageCount > 1 && (
+              <span className="text-[#8C857B] ml-1.5 hidden sm:inline">
+                (Content flows naturally with protected page breaks)
+              </span>
+            )}
+          </span>
+        </div>
 
         <div className="flex justify-center pb-12">
           <div
@@ -167,14 +169,15 @@ export function PreviewPane({ onDownload, isDownloading, onOpenImport, onOpenHis
                   <div
                     key={idx}
                     data-html2canvas-ignore="true"
-                    className="pointer-events-none absolute left-0 right-0 z-30 flex items-center select-none"
-                    style={{ top: breakY }}
+                    className="pointer-events-none absolute left-0 right-0 z-30 flex items-center justify-between select-none px-6"
+                    style={{ top: breakY - 12 }}
                   >
-                    <div className="h-0 flex-1 border-b-2 border-dashed border-rose-400/80" />
-                    <span className="mx-2 shrink-0 rounded-full border border-rose-300 bg-rose-50/95 px-2.5 py-0.5 text-[9px] font-bold tracking-wider text-rose-700 shadow-sm uppercase backdrop-blur-xs">
-                      Page Break · Page {idx + 2} Starts Here
+                    <div className="h-px flex-1 bg-gradient-to-r from-transparent via-[#E8E4DC] to-[#E8E4DC]" />
+                    <span className="mx-3 rounded-full border border-[#E8E4DC] bg-white/95 px-3 py-0.5 text-[9.5px] font-semibold tracking-wide text-[#666055] shadow-xs backdrop-blur-xs flex items-center gap-1.5 uppercase">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#FF5E1A]" />
+                      Page {idx + 2} Starts Here
                     </span>
-                    <div className="h-0 w-8 border-b-2 border-dashed border-rose-400/80" />
+                    <div className="h-px flex-1 bg-gradient-to-l from-transparent via-[#E8E4DC] to-[#E8E4DC]" />
                   </div>
                 ))}
 

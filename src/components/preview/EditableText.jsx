@@ -83,9 +83,9 @@ export function EditableText({
       onKeyDown={handleKeyDown}
       onPaste={handlePaste}
       data-placeholder={placeholder}
-      className={`relative inline-block cursor-text rounded px-1 -mx-1 transition-all select-text
-        hover:outline hover:outline-1 hover:outline-blue-500/35 hover:bg-blue-500/[0.04]
-        focus:outline-none focus:ring-2 focus:ring-blue-500/60 focus:bg-blue-500/[0.05]
+      className={`relative inline-block cursor-text rounded px-1 -mx-1 transition-all select-text min-h-[1.2em] min-w-[2ch]
+        hover:outline hover:outline-1 hover:outline-[#FF5E1A]/40 hover:bg-[#FF5E1A]/[0.03]
+        focus:outline-none focus:ring-2 focus:ring-[#FF5E1A]/50 focus:bg-[#FF5E1A]/[0.04]
         ${isEmpty ? 'text-[#9E988E] italic' : ''}
         ${className}`}
       style={style}

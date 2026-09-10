@@ -67,7 +67,7 @@ export async function exportToPdf(resumeData) {
         // Ensures inline styles are preserved in the cloned document
         const clonedCanvas = clonedDoc.querySelector('#resume-canvas')
         if (clonedCanvas) {
-          clonedCanvas.style.color = theme.accentColor
+          clonedCanvas.style.setProperty('--accent-color', theme.accentColor)
           clonedCanvas.style.boxShadow = 'none'
           clonedCanvas.style.transform = 'none'
           clonedCanvas.style.height = 'auto'

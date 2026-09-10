@@ -1,19 +1,32 @@
-import { Globe, Linkedin, Mail, MapPin, Phone } from 'lucide-react'
+import { Globe, Heart, Linkedin, Mail, MapPin, Phone } from 'lucide-react'
 import { TEMPLATE_BY_ID } from '../../../config/templates'
-import { dateRange } from '../../../lib/format'
 import { AddBulletButton, Bullet } from '../Bullet'
 import { useResumeStore } from '../../../store/useResumeStore'
 import { EditableText } from '../EditableText'
 import { EditableLink } from '../EditableLink'
 import { EditableDate } from '../EditableDate'
 
-const SANS = "'Inter', system-ui, sans-serif"
+const FONT_MAP = {
+  Poppins: "'Poppins', sans-serif",
+  Inter: "'Inter', sans-serif",
+  Roboto: "'Roboto', sans-serif",
+  Lato: "'Lato', sans-serif",
+  Garamond: "'EB Garamond', Garamond, Georgia, serif",
+  Courgette: "'Courgette', cursive",
+}
+
+const PADDING_MAP = {
+  compact: '24px 28px',
+  standard: '36px 38px',
+  spacious: '48px 52px',
+}
+
 const DISPLAY = "'Space Grotesk', 'Inter', sans-serif"
 const MONO = "'JetBrains Mono', ui-monospace, monospace"
 
 function RailHead({ children, accent, sectionKey, sectionTitles, onTitleChange }) {
   return (
-    <div className="mb-2 mt-4 first:mt-0">
+    <div className="mb-2 mt-4 first:mt-0 resume-block">
       <div className="flex items-center gap-1.5">
         <span className="inline-block h-3 w-[3px] rounded-full" style={{ backgroundColor: accent }} />
         <h2 className="text-[9.5px] font-bold uppercase tracking-[0.18em]" style={{ color: accent }}>
@@ -35,7 +48,7 @@ function RailHead({ children, accent, sectionKey, sectionTitles, onTitleChange }
 
 function MainHead({ children, accent, sectionKey, sectionTitles, onTitleChange }) {
   return (
-    <div className="mb-2 mt-4">
+    <div className="mb-2 mt-4 resume-block">
       <div className="flex items-center gap-2">
         <h2 className="whitespace-nowrap text-[10px] font-bold uppercase tracking-[0.24em]" style={{ color: accent, fontFamily: DISPLAY }}>
           {sectionKey && onTitleChange ? (
@@ -55,7 +68,19 @@ function MainHead({ children, accent, sectionKey, sectionTitles, onTitleChange }
 }
 
 export default function TechTemplate({ resume, theme }) {
-  const { basic = {}, experience = [], education = [], skillGroups = [], projects = [], certifications = [], visibility = {}, formatting = {} } = resume
+  const {
+    basic = {},
+    experience = [],
+    education = [],
+    skillGroups = [],
+    projects = [],
+    certifications = [],
+    websites = [],
+    hobbies = [],
+    visibility = {},
+    formatting = {},
+  } = resume
+
   const accent = theme?.accentColor || formatting?.accentColor || TEMPLATE_BY_ID.tech?.accent || '#244CEC'
   const sectionTitles = resume.sectionTitles || {}
 
@@ -65,10 +90,27 @@ export default function TechTemplate({ resume, theme }) {
   const renameSkillGroup = useResumeStore((s) => s.renameSkillGroup)
   const setSectionTitle = useResumeStore((s) => s.setSectionTitle)
 
+  const fontFamily = FONT_MAP[formatting.fontFamily] || "'Inter', system-ui, sans-serif"
+  const baseFontSize = formatting.fontSize || 9.8
+  const lineHeight = (formatting.lineHeight || 140) / 100
+  const letterSpacing = `${formatting.letterSpacing || 0}px`
+  const canvasPadding = PADDING_MAP[formatting.marginDensity || 'standard'] || '36px 38px'
+
   return (
-    <div className="flex flex-col" style={{ padding: '36px 34px 40px', color: '#111827', fontFamily: SANS, fontSize: '9.8px', lineHeight: 1.5 }}>
+    <div
+      className="flex flex-col min-h-full h-auto w-full bg-white"
+      style={{
+        padding: canvasPadding,
+        color: formatting.textColor || '#111827',
+        fontFamily,
+        fontSize: `${baseFontSize}pt`,
+        lineHeight,
+        letterSpacing,
+        boxSizing: 'border-box',
+      }}
+    >
       {/* Masthead */}
-      <header className="flex items-end justify-between gap-4 pb-3">
+      <header className="flex items-end justify-between gap-4 pb-3 resume-block">
         <div>
           <h1 className="text-[22px] font-bold tracking-tight" style={{ fontFamily: DISPLAY }}>
             <EditableText
@@ -85,7 +127,7 @@ export default function TechTemplate({ resume, theme }) {
             />
           </p>
         </div>
-        <div className="max-w-[230px] space-y-0.5 text-right text-[8.6px] text-slate-600">
+        <div className="max-w-[260px] space-y-0.5 text-right text-[8.6px] text-slate-600">
           {(basic.email || basic.email === '') && (
             <p className="flex items-center justify-end gap-1">
               <Mail size={9} className="shrink-0" style={{ color: accent }} />
@@ -116,7 +158,19 @@ export default function TechTemplate({ resume, theme }) {
               />
             </p>
           )}
-          {basic.linkedin && (
+          {websites.map((w) => (
+            <p key={w.id} className="flex items-center justify-end gap-1">
+              <Globe size={9} className="shrink-0" style={{ color: accent }} />
+              <EditableLink
+                url={w.url}
+                label={w.label}
+                accentColor={accent}
+                onChange={(newUrl) => updateItem('websites', w.id, { url: typeof newUrl === 'string' ? newUrl : newUrl.url })}
+                placeholder={w.label || "Link"}
+              />
+            </p>
+          ))}
+          {basic.linkedin && !websites.some((w) => (w.url || '').toLowerCase().includes('linkedin')) && (
             <p className="flex items-center justify-end gap-1">
               <Linkedin size={9} className="shrink-0" style={{ color: accent }} />
               <EditableLink
@@ -127,7 +181,7 @@ export default function TechTemplate({ resume, theme }) {
               />
             </p>
           )}
-          {basic.portfolio && (
+          {basic.portfolio && !websites.some((w) => (w.url || '').toLowerCase().includes('portfolio')) && (
             <p className="flex items-center justify-end gap-1">
               <Globe size={9} className="shrink-0" style={{ color: accent }} />
               <EditableLink
@@ -143,7 +197,7 @@ export default function TechTemplate({ resume, theme }) {
       <div style={{ backgroundColor: accent }} className="h-0.5 w-full mt-1 mb-2" />
 
       {(basic.summary || basic.summary === '') && (
-        <div className="mt-3 rounded-md border-l-2 py-0.5 pl-2.5 text-justify text-[9.6px] leading-relaxed" style={{ borderColor: accent }}>
+        <div className="resume-block mt-3 rounded-md border-l-2 py-0.5 pl-2.5 text-justify text-[9.6px] leading-relaxed" style={{ borderColor: accent }}>
           <EditableText
             multiline
             value={basic.summary}
@@ -156,13 +210,13 @@ export default function TechTemplate({ resume, theme }) {
 
       <div className="mt-4 flex gap-6">
         {/* Main column */}
-        <div className="min-w-0 flex-1">
+        <div className="min-w-0 flex-1 space-y-4">
           {visibility.experience !== false && experience.length > 0 && (
-            <section>
+            <section className="resume-block">
               <MainHead accent={accent} sectionKey="experience" sectionTitles={sectionTitles} onTitleChange={setSectionTitle}>Experience</MainHead>
-              <div className="space-y-2.5">
+              <div className="space-y-3">
                 {experience.map((exp) => (
-                  <div key={exp.id} className="group/exp break-inside-avoid">
+                  <div key={exp.id} className="group/exp break-inside-avoid resume-block">
                     <div className="flex items-baseline justify-between gap-2">
                       <p className="text-[10.6px] font-bold">
                         <EditableText
@@ -196,7 +250,7 @@ export default function TechTemplate({ resume, theme }) {
                       {(exp.bullets || []).map((b, i) => (
                         <Bullet key={i} expId={exp.id} index={i} text={b} marker="▸" className="gap-1.5" markerClass="text-[7px]" markerStyle={{ color: accent }} />
                       ))}
-                      <AddBulletButton expId={exp.id} className="opacity-0 transition-opacity group-hover/exp:opacity-100" />
+                      <AddBulletButton expId={exp.id} />
                     </div>
                   </div>
                 ))}
@@ -207,7 +261,7 @@ export default function TechTemplate({ resume, theme }) {
           {visibility.projects !== false && projects.length > 0 && (
             <section className="resume-block">
               <MainHead accent={accent} sectionKey="projects" sectionTitles={sectionTitles} onTitleChange={setSectionTitle}>Projects</MainHead>
-              <div className="space-y-2">
+              <div className="space-y-2.5">
                 {projects.map((p) => (
                   <div key={p.id} className="break-inside-avoid resume-block">
                     <div className="flex items-baseline justify-between gap-2">
@@ -227,21 +281,25 @@ export default function TechTemplate({ resume, theme }) {
                         className="font-mono text-[8.4px] font-medium"
                       />
                     </div>
-                    <div className="text-[8.6px] font-semibold" style={{ color: accent }}>
-                      <EditableText
-                        value={p.techStack}
-                        onChange={(val) => updateItem('projects', p.id, { techStack: val })}
-                        placeholder="Tech Stack"
-                      />
-                    </div>
-                    <div className="text-justify text-[9.4px] whitespace-pre-line leading-relaxed">
-                      <EditableText
-                        multiline
-                        value={p.description}
-                        onChange={(val) => updateItem('projects', p.id, { description: val })}
-                        placeholder="Project description..."
-                      />
-                    </div>
+                    {p.techStack && (
+                      <div className="text-[8.6px] font-semibold" style={{ color: accent }}>
+                        <EditableText
+                          value={p.techStack}
+                          onChange={(val) => updateItem('projects', p.id, { techStack: val })}
+                          placeholder="Tech Stack"
+                        />
+                      </div>
+                    )}
+                    {p.description && (
+                      <div className="text-justify text-[9.4px] whitespace-pre-line leading-relaxed">
+                        <EditableText
+                          multiline
+                          value={p.description}
+                          onChange={(val) => updateItem('projects', p.id, { description: val })}
+                          placeholder="Project description..."
+                        />
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -250,13 +308,13 @@ export default function TechTemplate({ resume, theme }) {
         </div>
 
         {/* Side rail */}
-        <aside className="w-[172px] shrink-0 border-l border-slate-200 pl-4" style={{ borderColor: `${accent}35` }}>
+        <aside className="w-[185px] shrink-0 border-l border-slate-200 pl-4 space-y-4" style={{ borderColor: `${accent}35` }}>
           {visibility.skills !== false && skillGroups.length > 0 && (
-            <section>
+            <section className="resume-block">
               <RailHead accent={accent} sectionKey="skills" sectionTitles={sectionTitles} onTitleChange={setSectionTitle}>Skills</RailHead>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {skillGroups.map((g) => (
-                  <div key={g.id}>
+                  <div key={g.id} className="resume-block">
                     <p className="text-[8.2px] font-bold uppercase tracking-[0.12em] text-slate-500">
                       <EditableText
                         value={g.label}
@@ -283,11 +341,11 @@ export default function TechTemplate({ resume, theme }) {
           )}
 
           {visibility.education !== false && education.length > 0 && (
-            <section>
+            <section className="resume-block">
               <RailHead accent={accent} sectionKey="education" sectionTitles={sectionTitles} onTitleChange={setSectionTitle}>Education</RailHead>
-              <div className="space-y-1.5">
+              <div className="space-y-2">
                 {education.map((e) => (
-                  <div key={e.id}>
+                  <div key={e.id} className="resume-block">
                     <p className="text-[9px] font-bold leading-tight">
                       <EditableText
                         value={e.degree}
@@ -309,13 +367,15 @@ export default function TechTemplate({ resume, theme }) {
                         placeholder="Grad Year"
                       />
                     </p>
-                    <p className="text-[8.4px] text-slate-500">
-                      <EditableText
-                        value={e.focus}
-                        onChange={(val) => updateItem('education', e.id, { focus: val })}
-                        placeholder="Focus"
-                      />
-                    </p>
+                    {e.focus && (
+                      <p className="text-[8.4px] text-slate-500">
+                        <EditableText
+                          value={e.focus}
+                          onChange={(val) => updateItem('education', e.id, { focus: val })}
+                          placeholder="Focus"
+                        />
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>
@@ -323,11 +383,11 @@ export default function TechTemplate({ resume, theme }) {
           )}
 
           {visibility.certifications !== false && certifications.length > 0 && (
-            <section>
+            <section className="resume-block">
               <RailHead accent={accent} sectionKey="certifications" sectionTitles={sectionTitles} onTitleChange={setSectionTitle}>Certifications</RailHead>
-              <div className="space-y-1">
+              <div className="space-y-1.5">
                 {certifications.map((c) => (
-                  <div key={c.id}>
+                  <div key={c.id} className="resume-block">
                     <p className="text-[8.8px] font-semibold leading-tight">
                       <EditableText
                         value={c.name}
@@ -341,8 +401,32 @@ export default function TechTemplate({ resume, theme }) {
                         onChange={(val) => updateItem('certifications', c.id, { issuer: val })}
                         placeholder="Issuer"
                       />
+                      {c.year && <span> · </span>}
+                      <EditableText
+                        value={c.year}
+                        onChange={(val) => updateItem('certifications', c.id, { year: val })}
+                        placeholder="Year"
+                      />
                     </p>
                   </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {visibility.hobbies !== false && hobbies.length > 0 && (
+            <section className="resume-block">
+              <RailHead accent={accent} sectionKey="hobbies" sectionTitles={sectionTitles} onTitleChange={setSectionTitle}>Hobbies</RailHead>
+              <div className="flex flex-wrap gap-1 text-[8.2px]">
+                {hobbies.map((h) => (
+                  <span key={h.id} className="inline-flex items-center gap-1 rounded bg-slate-100 px-1.5 py-0.5 text-slate-700">
+                    <Heart size={8} style={{ color: accent }} />
+                    <EditableText
+                      value={h.name}
+                      onChange={(val) => updateItem('hobbies', h.id, { name: val })}
+                      placeholder="Hobby"
+                    />
+                  </span>
                 ))}
               </div>
             </section>
@@ -352,4 +436,5 @@ export default function TechTemplate({ resume, theme }) {
     </div>
   )
 }
+
 

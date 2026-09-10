@@ -64,7 +64,7 @@ export function freshFormatting() {
 }
 
 export function defaultSectionOrder() {
-  return ['summary', 'experience', 'education', 'projects', 'websites', 'skills', 'hobbies']
+  return ['summary', 'experience', 'education', 'projects', 'certifications', 'websites', 'skills', 'hobbies']
 }
 
 export function defaultSectionTitles() {
