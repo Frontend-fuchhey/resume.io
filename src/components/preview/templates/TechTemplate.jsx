@@ -361,15 +361,15 @@ export default function TechTemplate({ resume, theme }) {
                   <div className="space-y-2.5">
                     {(cs.items || []).map((item) => (
                       <div key={item.id} className="break-inside-avoid resume-block">
-                        <div className="flex items-baseline justify-between gap-2">
-                          <p className="text-[10px] font-bold">
-                            <EditableText
-                              value={item.title}
-                              onChange={(val) => updateCustomItem(cs.id, item.id, { title: val })}
-                              placeholder="Title"
-                            />
-                          </p>
-                          {item.date && (
+                        {(item.title || item.date) && (
+                          <div className="flex items-baseline justify-between gap-2">
+                            <p className="text-[10px] font-bold">
+                              <EditableText
+                                value={item.title}
+                                onChange={(val) => updateCustomItem(cs.id, item.id, { title: val })}
+                                placeholder="Title"
+                              />
+                            </p>
                             <span className="font-mono text-[8.2px] text-slate-500">
                               <EditableText
                                 value={item.date}
@@ -377,8 +377,8 @@ export default function TechTemplate({ resume, theme }) {
                                 placeholder="Date"
                               />
                             </span>
-                          )}
-                        </div>
+                          </div>
+                        )}
                         {item.subtitle && (
                           <p className="text-[8.6px] font-semibold" style={{ color: accent }}>
                             <EditableText
@@ -388,9 +388,15 @@ export default function TechTemplate({ resume, theme }) {
                             />
                           </p>
                         )}
-                        {item.description && (
-                          <p className="text-[9.2px] text-slate-600 leading-relaxed whitespace-pre-line">{item.description}</p>
-                        )}
+                        <p className="text-[9.2px] text-slate-600 leading-relaxed whitespace-pre-line">
+                          <EditableText
+                            multiline
+                            value={item.description}
+                            onChange={(val) => updateCustomItem(cs.id, item.id, { description: val })}
+                            placeholder="Description"
+                            className="w-full"
+                          />
+                        </p>
                       </div>
                     ))}
                   </div>

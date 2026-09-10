@@ -257,10 +257,12 @@ export default function CyberTemplate({ resume, theme }) {
                 <div className="space-y-2">
                   {validItems.map((item) => (
                     <div key={item.id} className="rounded-lg px-3 py-2" style={{ background: '#f1f5f9', border: '1px solid #e2e8f0' }}>
-                      <div className="flex items-baseline justify-between gap-2">
-                        <p className="text-[10px] font-bold">{item.title}</p>
-                        {item.date && <span className="font-mono text-[8.4px] text-slate-500">{item.date}</span>}
-                      </div>
+                      {(item.title || item.date) && (
+                        <div className="flex items-baseline justify-between gap-2">
+                          <p className="text-[10px] font-bold">{item.title}</p>
+                          {item.date && <span className="font-mono text-[8.4px] text-slate-500">{item.date}</span>}
+                        </div>
+                      )}
                       {item.subtitle && <p className="text-[9px] font-medium" style={{ color: accent }}>{item.subtitle}</p>}
                       {item.description && <p className="mt-0.5 whitespace-pre-line text-[8.8px] text-slate-600">{item.description}</p>}
                     </div>

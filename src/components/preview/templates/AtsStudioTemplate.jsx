@@ -689,15 +689,15 @@ export default function AtsStudioTemplate({ resume, theme }) {
           <div className="space-y-3">
             {(cs.items || []).map((item) => (
               <div key={item.id} className="resume-block text-[9pt]">
-                <div className="flex items-baseline justify-between gap-2">
-                  <span className="font-bold text-[#1A1A1A]">
-                    <EditableText
-                      value={item.title}
-                      onChange={(val) => updateCustomItem(cs.id, item.id, { title: val })}
-                      placeholder="Title"
-                    />
-                  </span>
-                  {item.date && (
+                {(item.title || item.date) && (
+                  <div className="flex items-baseline justify-between gap-2">
+                    <span className="font-bold text-[#1A1A1A]">
+                      <EditableText
+                        value={item.title}
+                        onChange={(val) => updateCustomItem(cs.id, item.id, { title: val })}
+                        placeholder="Title"
+                      />
+                    </span>
                     <span className="text-[8.5pt] font-semibold text-[#666055]">
                       <EditableText
                         value={item.date}
@@ -705,8 +705,8 @@ export default function AtsStudioTemplate({ resume, theme }) {
                         placeholder="Date"
                       />
                     </span>
-                  )}
-                </div>
+                  </div>
+                )}
                 {item.subtitle && (
                   <p className="text-[8.5pt] font-medium" style={{ color: accentColor }}>
                     <EditableText
@@ -716,9 +716,15 @@ export default function AtsStudioTemplate({ resume, theme }) {
                     />
                   </p>
                 )}
-                {item.description && (
-                  <p className="mt-1 text-[8.5pt] text-[#403D39] leading-relaxed whitespace-pre-line">{item.description}</p>
-                )}
+                <p className="mt-1 text-[8.5pt] text-[#403D39] leading-relaxed whitespace-pre-line">
+                  <EditableText
+                    multiline
+                    value={item.description}
+                    onChange={(val) => updateCustomItem(cs.id, item.id, { description: val })}
+                    placeholder="Description"
+                    className="w-full"
+                  />
+                </p>
               </div>
             ))}
           </div>
