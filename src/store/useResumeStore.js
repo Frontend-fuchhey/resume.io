@@ -11,6 +11,11 @@ import {
   freshProject,
   freshSkillGroup,
   freshWebsite,
+  freshLanguage,
+  freshAward,
+  freshReference,
+  freshCustomSection,
+  freshCustomItem,
   defaultSectionOrder,
   defaultSectionTitles,
   blankVisibility,
@@ -54,6 +59,8 @@ const FACTORY = {
   hobbies: freshHobby,
   projects: freshProject,
   certifications: freshCertification,
+  languages: freshLanguage,
+  awards: freshAward,
 }
 
 const patchItem = (arr, id, patch) => arr.map((it) => (it.id === id ? { ...it, ...patch } : it))
@@ -69,6 +76,10 @@ export function snapshotState(state) {
     hobbies: JSON.parse(JSON.stringify(state.hobbies || [])),
     projects: JSON.parse(JSON.stringify(state.projects || [])),
     certifications: JSON.parse(JSON.stringify(state.certifications || [])),
+    languages: JSON.parse(JSON.stringify(state.languages || [])),
+    awards: JSON.parse(JSON.stringify(state.awards || [])),
+    references: JSON.parse(JSON.stringify(state.references || { mode: 'upon_request', text: 'References available upon request', items: [] })),
+    customSections: JSON.parse(JSON.stringify(state.customSections || [])),
     visibility: JSON.parse(JSON.stringify(state.visibility || blankVisibility())),
     sectionOrder: JSON.parse(JSON.stringify(state.sectionOrder || defaultSectionOrder())),
     sectionTitles: JSON.parse(JSON.stringify(state.sectionTitles || defaultSectionTitles())),
@@ -118,6 +129,10 @@ export const useResumeStore = create(
           hobbies: data.hobbies || [],
           projects: data.projects || [],
           certifications: data.certifications || [],
+          languages: data.languages || [],
+          awards: data.awards || [],
+          references: data.references || { mode: 'upon_request', text: 'References available upon request', items: [] },
+          customSections: data.customSections || [],
           visibility: { ...blankVisibility(), ...(data.visibility || {}) },
           sectionOrder: data.sectionOrder || defaultSectionOrder(),
           sectionTitles: { ...defaultSectionTitles(), ...(data.sectionTitles || {}) },
@@ -354,6 +369,118 @@ export const useResumeStore = create(
         })
       },
 
+      // ---- references ---------------------------------------------------
+      updateReferencesConfig: (patch) => {
+        debouncedPushHistory(get)
+        set((s) => ({
+          references: {
+            ...(s.references || { mode: 'upon_request', text: 'References available upon request', items: [] }),
+            ...patch,
+          },
+        }))
+      },
+
+      addReference: () => {
+        get().pushHistory()
+        const newRef = freshReference()
+        set((s) => ({
+          references: {
+            ...(s.references || { mode: 'upon_request', text: 'References available upon request', items: [] }),
+            items: [...(s.references?.items || []), newRef],
+          },
+        }))
+      },
+
+      updateReference: (id, patch) => {
+        debouncedPushHistory(get)
+        set((s) => ({
+          references: {
+            ...(s.references || { mode: 'upon_request', text: 'References available upon request', items: [] }),
+            items: (s.references?.items || []).map((it) => (it.id === id ? { ...it, ...patch } : it)),
+          },
+        }))
+      },
+
+      removeReference: (id) => {
+        get().pushHistory()
+        set((s) => ({
+          references: {
+            ...(s.references || { mode: 'upon_request', text: 'References available upon request', items: [] }),
+            items: (s.references?.items || []).filter((it) => it.id !== id),
+          },
+        }))
+      },
+
+      // ---- custom sections ----------------------------------------------
+      addCustomSection: (title = 'Custom Section') => {
+        get().pushHistory()
+        const sec = freshCustomSection(title)
+        set((s) => ({
+          customSections: [...(s.customSections || []), sec],
+          sectionOrder: [...(s.sectionOrder || defaultSectionOrder()), `custom_${sec.id}`],
+          sectionTitles: { ...(s.sectionTitles || defaultSectionTitles()), [`custom_${sec.id}`]: title },
+        }))
+        return sec.id
+      },
+
+      removeCustomSection: (secId) => {
+        get().pushHistory()
+        set((s) => ({
+          customSections: (s.customSections || []).filter((cs) => cs.id !== secId),
+          sectionOrder: (s.sectionOrder || defaultSectionOrder()).filter((k) => k !== `custom_${secId}` && k !== secId),
+        }))
+      },
+
+      updateCustomSection: (secId, patch) => {
+        debouncedPushHistory(get)
+        set((s) => ({
+          customSections: (s.customSections || []).map((cs) =>
+            cs.id === secId ? { ...cs, ...patch } : cs
+          ),
+          sectionTitles: patch.title
+            ? { ...(s.sectionTitles || {}), [`custom_${secId}`]: patch.title }
+            : s.sectionTitles,
+        }))
+      },
+
+      addCustomItem: (secId) => {
+        get().pushHistory()
+        const item = freshCustomItem()
+        set((s) => ({
+          customSections: (s.customSections || []).map((cs) =>
+            cs.id === secId ? { ...cs, items: [...(cs.items || []), item] } : cs
+          ),
+        }))
+      },
+
+      updateCustomItem: (secId, itemId, patch) => {
+        debouncedPushHistory(get)
+        set((s) => ({
+          customSections: (s.customSections || []).map((cs) =>
+            cs.id === secId
+              ? {
+                  ...cs,
+                  items: (cs.items || []).map((it) => (it.id === itemId ? { ...it, ...patch } : it)),
+                }
+              : cs
+          ),
+        }))
+      },
+
+      removeCustomItem: (secId, itemId) => {
+        get().pushHistory()
+        set((s) => ({
+          customSections: (s.customSections || []).map((cs) =>
+            cs.id === secId
+              ? {
+                  ...cs,
+                  items: (cs.items || []).filter((it) => it.id !== itemId),
+                }
+              : cs
+          ),
+        }))
+      },
+
       // ---- import & backup ----------------------------------------------
       importResume: (data, customTitle) => {
         get().pushHistory()
@@ -366,6 +493,10 @@ export const useResumeStore = create(
           hobbies: data.hobbies || [],
           projects: data.projects || [],
           certifications: data.certifications || [],
+          languages: data.languages || [],
+          awards: data.awards || [],
+          references: data.references || { mode: 'upon_request', text: 'References available upon request', items: [] },
+          customSections: data.customSections || [],
           visibility: { ...blankVisibility(), ...(data.visibility || {}) },
           sectionOrder: data.sectionOrder || defaultSectionOrder(),
           sectionTitles: { ...defaultSectionTitles(), ...(data.sectionTitles || {}) },

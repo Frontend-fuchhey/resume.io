@@ -45,6 +45,26 @@ export function freshCertification() {
   return { id: uid(), name: '', issuer: '', year: '' }
 }
 
+export function freshLanguage() {
+  return { id: uid(), name: '', level: 'Fluent', rating: 4 }
+}
+
+export function freshAward() {
+  return { id: uid(), title: '', issuer: '', date: '', description: '' }
+}
+
+export function freshReference() {
+  return { id: uid(), name: '', role: '', company: '', email: '', phone: '' }
+}
+
+export function freshCustomItem() {
+  return { id: uid(), title: '', subtitle: '', date: '', description: '' }
+}
+
+export function freshCustomSection(title = 'Custom Section') {
+  return { id: uid(), title, items: [freshCustomItem()] }
+}
+
 export function freshFormatting() {
   return {
     fontFamily: 'Poppins', // 'Poppins' | 'Inter' | 'Roboto' | 'Lato' | 'Garamond' | 'Courgette'
@@ -64,7 +84,7 @@ export function freshFormatting() {
 }
 
 export function defaultSectionOrder() {
-  return ['summary', 'experience', 'education', 'projects', 'certifications', 'websites', 'skills', 'hobbies']
+  return ['summary', 'experience', 'education', 'projects', 'certifications', 'skills', 'languages', 'awards', 'websites', 'hobbies', 'references', 'customSections']
 }
 
 export function defaultSectionTitles() {
@@ -77,6 +97,10 @@ export function defaultSectionTitles() {
     skills: 'Skills & Competencies',
     hobbies: 'Hobbies & Interests',
     certifications: 'Certifications',
+    languages: 'Languages',
+    awards: 'Awards & Honors',
+    references: 'References',
+    customSections: 'Additional Highlights',
   }
 }
 
@@ -89,6 +113,10 @@ export function blankVisibility() {
     hobbies: true,
     projects: true,
     certifications: true,
+    languages: true,
+    awards: true,
+    references: true,
+    customSections: true,
   }
 }
 
@@ -103,6 +131,14 @@ export function blankResume() {
     hobbies: [],
     projects: [],
     certifications: [],
+    languages: [],
+    awards: [],
+    references: {
+      mode: 'upon_request', // 'upon_request' | 'structured'
+      text: 'References available upon request',
+      items: [],
+    },
+    customSections: [],
     visibility: blankVisibility(),
     sectionOrder: defaultSectionOrder(),
     sectionTitles: defaultSectionTitles(),

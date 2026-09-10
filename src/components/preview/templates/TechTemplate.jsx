@@ -75,6 +75,10 @@ export default function TechTemplate({ resume, theme }) {
     skillGroups = [],
     projects = [],
     certifications = [],
+    languages = [],
+    awards = [],
+    references = { mode: 'upon_request', text: 'References available upon request', items: [] },
+    customSections = [],
     websites = [],
     hobbies = [],
     visibility = {},
@@ -89,6 +93,8 @@ export default function TechTemplate({ resume, theme }) {
   const updateSkill = useResumeStore((s) => s.updateSkill)
   const renameSkillGroup = useResumeStore((s) => s.renameSkillGroup)
   const setSectionTitle = useResumeStore((s) => s.setSectionTitle)
+  const updateCustomSection = useResumeStore((s) => s.updateCustomSection)
+  const updateCustomItem = useResumeStore((s) => s.updateCustomItem)
 
   const fontFamily = FONT_MAP[formatting.fontFamily] || "'Inter', system-ui, sans-serif"
   const baseFontSize = formatting.fontSize || 9.8
@@ -305,6 +311,118 @@ export default function TechTemplate({ resume, theme }) {
               </div>
             </section>
           )}
+          {visibility.awards !== false && awards.length > 0 && (
+            <section className="resume-block">
+              <MainHead accent={accent} sectionKey="awards" sectionTitles={sectionTitles} onTitleChange={setSectionTitle}>Awards & Honors</MainHead>
+              <div className="space-y-2.5">
+                {awards.map((a) => (
+                  <div key={a.id} className="break-inside-avoid resume-block">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <p className="text-[10px] font-bold">
+                        <EditableText
+                          value={a.title}
+                          onChange={(val) => updateItem('awards', a.id, { title: val })}
+                          placeholder="Award Title"
+                        />
+                      </p>
+                      {a.date && (
+                        <span className="font-mono text-[8.2px] text-slate-500">
+                          <EditableText
+                            value={a.date}
+                            onChange={(val) => updateItem('awards', a.id, { date: val })}
+                            placeholder="Year"
+                          />
+                        </span>
+                      )}
+                    </div>
+                    {a.issuer && (
+                      <p className="text-[8.6px] font-semibold" style={{ color: accent }}>
+                        <EditableText
+                          value={a.issuer}
+                          onChange={(val) => updateItem('awards', a.id, { issuer: val })}
+                          placeholder="Issuer"
+                        />
+                      </p>
+                    )}
+                    {a.description && (
+                      <p className="text-[9.2px] text-slate-600 leading-relaxed whitespace-pre-line">{a.description}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {visibility.customSections !== false && customSections.length > 0 && (
+            <div className="space-y-4">
+              {customSections.map((cs) => (
+                <section key={cs.id} className="resume-block">
+                  <MainHead accent={accent} sectionKey={`custom_${cs.id}`} sectionTitles={{ [`custom_${cs.id}`]: cs.title }} onTitleChange={(_, v) => updateCustomSection(cs.id, { title: v })}>{cs.title}</MainHead>
+                  <div className="space-y-2.5">
+                    {(cs.items || []).map((item) => (
+                      <div key={item.id} className="break-inside-avoid resume-block">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <p className="text-[10px] font-bold">
+                            <EditableText
+                              value={item.title}
+                              onChange={(val) => updateCustomItem(cs.id, item.id, { title: val })}
+                              placeholder="Title"
+                            />
+                          </p>
+                          {item.date && (
+                            <span className="font-mono text-[8.2px] text-slate-500">
+                              <EditableText
+                                value={item.date}
+                                onChange={(val) => updateCustomItem(cs.id, item.id, { date: val })}
+                                placeholder="Date"
+                              />
+                            </span>
+                          )}
+                        </div>
+                        {item.subtitle && (
+                          <p className="text-[8.6px] font-semibold" style={{ color: accent }}>
+                            <EditableText
+                              value={item.subtitle}
+                              onChange={(val) => updateCustomItem(cs.id, item.id, { subtitle: val })}
+                              placeholder="Subtitle"
+                            />
+                          </p>
+                        )}
+                        {item.description && (
+                          <p className="text-[9.2px] text-slate-600 leading-relaxed whitespace-pre-line">{item.description}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+          )}
+
+          {visibility.references !== false && (
+            (references.mode === 'upon_request' && references.text?.trim()) ||
+            (references.mode === 'structured' && (references.items || []).length > 0)
+          ) && (
+            <section className="resume-block">
+              <MainHead accent={accent} sectionKey="references" sectionTitles={sectionTitles} onTitleChange={setSectionTitle}>References</MainHead>
+              {references.mode === 'upon_request' ? (
+                <p className="italic text-[9px] text-slate-600">
+                  {references.text || 'References available upon request'}
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[8.6px]">
+                  {(references.items || []).map((r) => (
+                    <div key={r.id} className="rounded border border-slate-200/80 p-2 space-y-0.5">
+                      <p className="font-bold text-slate-900">{r.name}</p>
+                      <p className="text-slate-600">{r.role}{r.company ? ` · ${r.company}` : ''}</p>
+                      {r.email && <p className="text-slate-500">{r.email}</p>}
+                      {r.phone && <p className="text-slate-500">{r.phone}</p>}
+                    </div>
+                  ))}
+                </div>
+              )}
+            </section>
+          )}
         </div>
 
         {/* Side rail */}
@@ -332,6 +450,39 @@ export default function TechTemplate({ resume, theme }) {
                           />
                           {idx < g.items.length - 1 ? ', ' : ''}
                         </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {visibility.languages !== false && languages.length > 0 && (
+            <section className="resume-block">
+              <RailHead accent={accent} sectionKey="languages" sectionTitles={sectionTitles} onTitleChange={setSectionTitle}>Languages</RailHead>
+              <div className="space-y-1.5 text-[8.6px]">
+                {languages.map((l) => (
+                  <div key={l.id} className="flex items-center justify-between">
+                    <div>
+                      <p className="font-semibold text-slate-800">
+                        <EditableText
+                          value={l.name}
+                          onChange={(val) => updateItem('languages', l.id, { name: val })}
+                          placeholder="Language"
+                        />
+                      </p>
+                      {l.level && <p className="text-[7.6px] text-slate-500">{l.level}</p>}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((dot) => (
+                        <span
+                          key={dot}
+                          className="h-1.5 w-1.5 rounded-full"
+                          style={{
+                            backgroundColor: (l.rating || 4) >= dot ? accent : '#e2e8f0',
+                          }}
+                        />
                       ))}
                     </div>
                   </div>

@@ -25,7 +25,20 @@ function Section({ title, accent, children }) {
 export default function CyberTemplate({ resume, theme }) {
   const t = TEMPLATE_BY_ID.cyber
   const accent = theme?.accentColor || resume?.formatting?.accentColor || t?.accent || '#0e7490'
-  const { basic, experience, education, skillGroups, projects, certifications, visibility } = resume
+  const {
+    basic,
+    experience,
+    education,
+    skillGroups,
+    projects,
+    certifications,
+    languages = [],
+    awards = [],
+    references = { mode: 'upon_request', text: 'References available upon request', items: [] },
+    customSections = [],
+    sectionTitles = {},
+    visibility = {},
+  } = resume
 
   const contact = [
     { Icon: Phone, label: basic.phone },
@@ -187,6 +200,104 @@ export default function CyberTemplate({ resume, theme }) {
             </Section>
           )}
         </div>
+
+        {visibility.languages !== false && languages.some((l) => l.name) && (
+          <Section title={sectionTitles.languages || 'Languages'} accent={accent}>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+              {languages
+                .filter((l) => l.name)
+                .map((l) => (
+                  <div key={l.id} className="flex items-center justify-between rounded-lg px-3 py-1.5" style={{ background: '#f1f5f9', border: '1px solid #e2e8f0' }}>
+                    <div>
+                      <p className="text-[9.4px] font-bold">{l.name}</p>
+                      {l.level && <p className="text-[8px] text-slate-500">{l.level}</p>}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      {[1, 2, 3, 4, 5].map((dot) => (
+                        <span
+                          key={dot}
+                          className="h-1.5 w-1.5 rounded-full"
+                          style={{
+                            backgroundColor: (l.rating || 4) >= dot ? accent : '#cbd5e1',
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                ))}
+            </div>
+          </Section>
+        )}
+
+        {visibility.awards !== false && awards.some((a) => a.title || a.issuer) && (
+          <Section title={sectionTitles.awards || 'Awards & Honors'} accent={accent}>
+            <div className="space-y-2">
+              {awards
+                .filter((a) => a.title || a.issuer)
+                .map((a) => (
+                  <div key={a.id} className="rounded-lg px-3 py-2" style={{ background: '#f1f5f9', border: '1px solid #e2e8f0' }}>
+                    <div className="flex items-baseline justify-between gap-2">
+                      <p className="text-[10px] font-bold">{a.title}</p>
+                      {a.date && <span className="font-mono text-[8.4px] text-slate-500">{a.date}</span>}
+                    </div>
+                    {a.issuer && <p className="text-[9px] font-medium" style={{ color: accent }}>{a.issuer}</p>}
+                    {a.description && <p className="mt-0.5 text-[8.8px] text-slate-600">{a.description}</p>}
+                  </div>
+                ))}
+            </div>
+          </Section>
+        )}
+
+        {visibility.customSections !== false &&
+          customSections.map((sec) => {
+            const validItems = (sec.items || []).filter((item) => item.title || item.subtitle || item.description)
+            if (validItems.length === 0) return null
+            return (
+              <Section key={sec.id} title={sec.title || 'Custom Section'} accent={accent}>
+                <div className="space-y-2">
+                  {validItems.map((item) => (
+                    <div key={item.id} className="rounded-lg px-3 py-2" style={{ background: '#f1f5f9', border: '1px solid #e2e8f0' }}>
+                      <div className="flex items-baseline justify-between gap-2">
+                        <p className="text-[10px] font-bold">{item.title}</p>
+                        {item.date && <span className="font-mono text-[8.4px] text-slate-500">{item.date}</span>}
+                      </div>
+                      {item.subtitle && <p className="text-[9px] font-medium" style={{ color: accent }}>{item.subtitle}</p>}
+                      {item.description && <p className="mt-0.5 whitespace-pre-line text-[8.8px] text-slate-600">{item.description}</p>}
+                    </div>
+                  ))}
+                </div>
+              </Section>
+            )
+          })}
+
+        {visibility.references !== false && (
+          <Section title={sectionTitles.references || 'References'} accent={accent}>
+            {references.mode === 'upon_request' ? (
+              <p className="text-[9.2px] italic text-slate-600">
+                {references.text || 'References available upon request.'}
+              </p>
+            ) : (
+              <div className="grid grid-cols-2 gap-3">
+                {(references.items || [])
+                  .filter((r) => r.name || r.company)
+                  .map((ref) => (
+                    <div key={ref.id} className="rounded-lg px-3 py-2" style={{ background: '#f1f5f9', border: '1px solid #e2e8f0' }}>
+                      <p className="text-[10px] font-bold">{ref.name}</p>
+                      {(ref.role || ref.company) && (
+                        <p className="text-[8.8px] font-medium" style={{ color: accent }}>
+                          {ref.role}
+                          {ref.role && ref.company && ' · '}
+                          {ref.company}
+                        </p>
+                      )}
+                      {ref.email && <p className="text-[8.2px] text-slate-600">{ref.email}</p>}
+                      {ref.phone && <p className="text-[8.2px] text-slate-500">{ref.phone}</p>}
+                    </div>
+                  ))}
+              </div>
+            )}
+          </Section>
+        )}
       </div>
     </div>
   )

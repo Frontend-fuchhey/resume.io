@@ -42,9 +42,13 @@ export default function AtsStudioTemplate({ resume, theme }) {
   const hobbies = resume.hobbies || []
   const projects = resume.projects || []
   const certifications = resume.certifications || []
+  const languages = resume.languages || []
+  const awards = resume.awards || []
+  const references = resume.references || { mode: 'upon_request', text: 'References available upon request', items: [] }
+  const customSections = resume.customSections || []
   const visibility = resume.visibility || {}
   const formatting = resume.formatting || {}
-  const sectionOrder = resume.sectionOrder || ['summary', 'experience', 'education', 'projects', 'certifications', 'websites', 'skills', 'hobbies']
+  const sectionOrder = resume.sectionOrder || defaultSectionOrder()
   const sectionTitles = resume.sectionTitles || {}
 
   const setActiveItem = useResumeStore((s) => s.setActiveItem)
@@ -54,6 +58,8 @@ export default function AtsStudioTemplate({ resume, theme }) {
   const updateSkill = useResumeStore((s) => s.updateSkill)
   const renameSkillGroup = useResumeStore((s) => s.renameSkillGroup)
   const setSectionTitle = useResumeStore((s) => s.setSectionTitle)
+  const updateCustomSection = useResumeStore((s) => s.updateCustomSection)
+  const updateCustomItem = useResumeStore((s) => s.updateCustomItem)
 
   // Typography & design styling from Right Toolbar
   const fontFamily = FONT_MAP[formatting.fontFamily] || "'Poppins', sans-serif"
@@ -73,6 +79,13 @@ export default function AtsStudioTemplate({ resume, theme }) {
   const hasSkills = visibility.skills !== false && skillGroups.length > 0
   const hasHobbies = visibility.hobbies !== false && hobbies.length > 0
   const hasCertifications = visibility.certifications !== false && certifications.length > 0
+  const hasLanguages = visibility.languages !== false && languages.length > 0
+  const hasAwards = visibility.awards !== false && awards.length > 0
+  const hasReferences = visibility.references !== false && (
+    (references.mode === 'upon_request' && references.text?.trim()) ||
+    (references.mode === 'structured' && (references.items || []).length > 0)
+  )
+  const hasCustomSections = visibility.customSections !== false && customSections.length > 0
   const hasSummary = basic.summary && basic.summary.trim()
   const hasExperience = visibility.experience !== false && experience.length > 0
   const hasProjects = visibility.projects !== false && projects.length > 0
@@ -529,16 +542,205 @@ export default function AtsStudioTemplate({ resume, theme }) {
     </section>
   )
 
+  const renderLanguages = () => (
+    <section key="languages" className="resume-block">
+      <h2
+        className="text-[10pt] font-bold uppercase tracking-wider"
+        style={{ color: accentColor }}
+      >
+        <EditableText
+          value={sectionTitles.languages || 'Languages'}
+          onChange={(val) => setSectionTitle('languages', val)}
+          placeholder="Languages"
+        />
+      </h2>
+      <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-1.5 opacity-40" />
+      <div className="space-y-2">
+        {languages.map((l) => (
+          <div key={l.id} className="resume-block text-[8.5pt]">
+            <div className="flex items-center justify-between gap-1">
+              <span className="font-bold text-[#1A1A1A]">
+                <EditableText
+                  value={l.name}
+                  onChange={(val) => updateItem('languages', l.id, { name: val })}
+                  placeholder="Language"
+                />
+              </span>
+              <div className="flex items-center gap-1">
+                {[1, 2, 3, 4, 5].map((dot) => (
+                  <span
+                    key={dot}
+                    className="h-1.5 w-1.5 rounded-full"
+                    style={{
+                      backgroundColor: (l.rating || 4) >= dot ? accentColor : '#E8E4DC',
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+            {l.level && (
+              <p className="text-[8pt] text-[#666055]">{l.level}</p>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+
+  const renderAwards = () => (
+    <section key="awards" className="resume-block">
+      <h2
+        className="text-[11pt] font-bold uppercase tracking-wider"
+        style={{ color: accentColor }}
+      >
+        <EditableText
+          value={sectionTitles.awards || 'Awards & Honors'}
+          onChange={(val) => setSectionTitle('awards', val)}
+          placeholder="Awards & Honors"
+        />
+      </h2>
+      <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-2 opacity-40" />
+      <div className="space-y-3">
+        {awards.map((a) => (
+          <div key={a.id} className="resume-block text-[9pt]">
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="font-bold text-[#1A1A1A]">
+                <EditableText
+                  value={a.title}
+                  onChange={(val) => updateItem('awards', a.id, { title: val })}
+                  placeholder="Award Title"
+                />
+              </span>
+              {a.date && (
+                <span className="text-[8.5pt] font-semibold text-[#666055]">
+                  <EditableText
+                    value={a.date}
+                    onChange={(val) => updateItem('awards', a.id, { date: val })}
+                    placeholder="Year"
+                  />
+                </span>
+              )}
+            </div>
+            {a.issuer && (
+              <div className="text-[8.5pt] font-medium" style={{ color: accentColor }}>
+                <EditableText
+                  value={a.issuer}
+                  onChange={(val) => updateItem('awards', a.id, { issuer: val })}
+                  placeholder="Issuer"
+                />
+              </div>
+            )}
+            {a.description && (
+              <p className="mt-1 text-[8.5pt] text-[#403D39] leading-relaxed whitespace-pre-line">{a.description}</p>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+
+  const renderReferences = () => (
+    <section key="references" className="resume-block">
+      <h2
+        className="text-[11pt] font-bold uppercase tracking-wider"
+        style={{ color: accentColor }}
+      >
+        <EditableText
+          value={sectionTitles.references || 'References'}
+          onChange={(val) => setSectionTitle('references', val)}
+          placeholder="References"
+        />
+      </h2>
+      <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-2 opacity-40" />
+      {references.mode === 'upon_request' ? (
+        <p className="italic text-[9pt] text-[#666055]">
+          {references.text || 'References available upon request'}
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          {(references.items || []).map((r) => (
+            <div key={r.id} className="resume-block rounded-md border border-[#E8E4DC]/80 bg-[#FBF9F5]/50 p-2 text-[8.5pt]">
+              <p className="font-bold text-[#1A1A1A]">{r.name}</p>
+              <p className="text-[8pt] text-[#666055]">{r.role}{r.company ? ` · ${r.company}` : ''}</p>
+              {r.email && <p className="text-[8pt] text-[#403D39] mt-0.5">{r.email}</p>}
+              {r.phone && <p className="text-[8pt] text-[#403D39]">{r.phone}</p>}
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  )
+
+  const renderCustomSections = () => (
+    <div key="customSections" className="space-y-5">
+      {customSections.map((cs) => (
+        <section key={cs.id} className="resume-block">
+          <h2
+            className="text-[11pt] font-bold uppercase tracking-wider"
+            style={{ color: accentColor }}
+          >
+            <EditableText
+              value={cs.title}
+              onChange={(val) => updateCustomSection(cs.id, { title: val })}
+              placeholder="Section Heading"
+            />
+          </h2>
+          <div style={{ backgroundColor: accentColor }} className="h-0.5 w-full my-2 opacity-40" />
+          <div className="space-y-3">
+            {(cs.items || []).map((item) => (
+              <div key={item.id} className="resume-block text-[9pt]">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="font-bold text-[#1A1A1A]">
+                    <EditableText
+                      value={item.title}
+                      onChange={(val) => updateCustomItem(cs.id, item.id, { title: val })}
+                      placeholder="Title"
+                    />
+                  </span>
+                  {item.date && (
+                    <span className="text-[8.5pt] font-semibold text-[#666055]">
+                      <EditableText
+                        value={item.date}
+                        onChange={(val) => updateCustomItem(cs.id, item.id, { date: val })}
+                        placeholder="Date"
+                      />
+                    </span>
+                  )}
+                </div>
+                {item.subtitle && (
+                  <p className="text-[8.5pt] font-medium" style={{ color: accentColor }}>
+                    <EditableText
+                      value={item.subtitle}
+                      onChange={(val) => updateCustomItem(cs.id, item.id, { subtitle: val })}
+                      placeholder="Subtitle / Organization"
+                    />
+                  </p>
+                )}
+                {item.description && (
+                  <p className="mt-1 text-[8.5pt] text-[#403D39] leading-relaxed whitespace-pre-line">{item.description}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  )
+
   // Map section keys to their render functions
   const SECTION_MAP = {
     websites: { hasContent: hasContact, render: renderContactAndWebsites, side: 'left' },
     education: { hasContent: hasEducation, render: renderEducation, side: 'left' },
     skills: { hasContent: hasSkills, render: renderSkills, side: 'left' },
     certifications: { hasContent: hasCertifications, render: renderCertifications, side: 'left' },
+    languages: { hasContent: hasLanguages, render: renderLanguages, side: 'left' },
     hobbies: { hasContent: hasHobbies, render: renderHobbies, side: 'left' },
     summary: { hasContent: hasSummary || basic.summary === '', render: renderSummary, side: 'right' },
     experience: { hasContent: hasExperience, render: renderExperience, side: 'right' },
     projects: { hasContent: hasProjects, render: renderProjects, side: 'right' },
+    awards: { hasContent: hasAwards, render: renderAwards, side: 'right' },
+    references: { hasContent: hasReferences, render: renderReferences, side: 'right' },
+    customSections: { hasContent: hasCustomSections, render: renderCustomSections, side: 'right' },
   }
 
   // Sort sections in each column based on sectionOrder

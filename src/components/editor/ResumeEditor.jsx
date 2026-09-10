@@ -1,6 +1,7 @@
 import { Reorder, useDragControls } from 'framer-motion'
 import {
   Award,
+  BookmarkPlus,
   Briefcase,
   ChevronDown,
   ChevronUp,
@@ -10,8 +11,11 @@ import {
   GraduationCap,
   GripVertical,
   Heart,
+  Languages,
   Tag,
+  Trophy,
   User,
+  Users,
 } from 'lucide-react'
 import { BasicForm } from '../forms/BasicForm'
 import { SummaryForm } from '../forms/SummaryForm'
@@ -22,6 +26,10 @@ import { WebsitesManager } from '../forms/WebsitesManager'
 import { SkillsManager } from '../forms/SkillsManager'
 import { HobbiesManager } from '../forms/HobbiesManager'
 import { CertsManager } from '../forms/ProjectsCertsManager'
+import { LanguagesManager } from '../forms/LanguagesManager'
+import { AwardsManager } from '../forms/AwardsManager'
+import { ReferencesManager } from '../forms/ReferencesManager'
+import { CustomSectionsManager } from '../forms/CustomSectionsManager'
 import { SectionCard, VisibilityToggle } from '../ui/sectioncard'
 import { useResumeStore } from '../../store/useResumeStore'
 import { defaultSectionOrder } from '../../lib/factory'
@@ -72,15 +80,6 @@ const SECTION_CONFIGS = {
     hasVisibility: true,
     getBadge: (s) => (s.certifications?.length ? `${s.certifications.length}` : null),
   },
-  websites: {
-    icon: Globe,
-    title: 'Websites & Social Links',
-    subtitle: 'Portfolio, GitHub, LinkedIn & professional profiles',
-    defaultOpen: false,
-    Component: WebsitesManager,
-    hasVisibility: true,
-    getBadge: (s) => (s.websites?.length ? `${s.websites.length}` : null),
-  },
   skills: {
     icon: Tag,
     title: 'Skills',
@@ -93,6 +92,33 @@ const SECTION_CONFIGS = {
       return count ? `${count}` : null
     },
   },
+  languages: {
+    icon: Languages,
+    title: 'Languages',
+    subtitle: 'Language proficiencies & CEFR ratings',
+    defaultOpen: false,
+    Component: LanguagesManager,
+    hasVisibility: true,
+    getBadge: (s) => (s.languages?.length ? `${s.languages.length}` : null),
+  },
+  awards: {
+    icon: Trophy,
+    title: 'Awards & Honors',
+    subtitle: 'Scholarships, hackathons & recognitions',
+    defaultOpen: false,
+    Component: AwardsManager,
+    hasVisibility: true,
+    getBadge: (s) => (s.awards?.length ? `${s.awards.length}` : null),
+  },
+  websites: {
+    icon: Globe,
+    title: 'Websites & Social Links',
+    subtitle: 'Portfolio, GitHub, LinkedIn & professional profiles',
+    defaultOpen: false,
+    Component: WebsitesManager,
+    hasVisibility: true,
+    getBadge: (s) => (s.websites?.length ? `${s.websites.length}` : null),
+  },
   hobbies: {
     icon: Heart,
     title: 'Hobbies',
@@ -101,6 +127,29 @@ const SECTION_CONFIGS = {
     Component: HobbiesManager,
     hasVisibility: true,
     getBadge: (s) => (s.hobbies?.length ? `${s.hobbies.length}` : null),
+  },
+  references: {
+    icon: Users,
+    title: 'References',
+    subtitle: 'Referees & professional endorsements',
+    defaultOpen: false,
+    Component: ReferencesManager,
+    hasVisibility: true,
+    getBadge: (s) =>
+      s.references?.mode === 'upon_request'
+        ? 'Request'
+        : s.references?.items?.length
+        ? `${s.references.items.length}`
+        : null,
+  },
+  customSections: {
+    icon: BookmarkPlus,
+    title: 'Custom Sections',
+    subtitle: 'Publications, volunteering, patents & extra activities',
+    defaultOpen: false,
+    Component: CustomSectionsManager,
+    hasVisibility: true,
+    getBadge: (s) => (s.customSections?.length ? `${s.customSections.length}` : null),
   },
 }
 

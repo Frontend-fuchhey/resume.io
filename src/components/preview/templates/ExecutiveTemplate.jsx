@@ -50,6 +50,10 @@ export default function ExecutiveTemplate({ resume, theme }) {
     skillGroups = [],
     projects = [],
     certifications = [],
+    languages = [],
+    awards = [],
+    references = { mode: 'upon_request', text: 'References available upon request', items: [] },
+    customSections = [],
     websites = [],
     hobbies = [],
     visibility = {},
@@ -58,13 +62,15 @@ export default function ExecutiveTemplate({ resume, theme }) {
 
   const accent = theme?.accentColor || formatting?.accentColor || TEMPLATE_BY_ID.exec?.accent || '#FF5E1A'
   const sectionTitles = resume.sectionTitles || {}
-  const sectionOrder = resume.sectionOrder || ['summary', 'experience', 'projects', 'education', 'certifications', 'skills', 'hobbies']
+  const sectionOrder = resume.sectionOrder || defaultSectionOrder()
 
   const setBasic = useResumeStore((s) => s.setBasic)
   const updateItem = useResumeStore((s) => s.updateItem)
   const updateSkill = useResumeStore((s) => s.updateSkill)
   const renameSkillGroup = useResumeStore((s) => s.renameSkillGroup)
   const setSectionTitle = useResumeStore((s) => s.setSectionTitle)
+  const updateCustomSection = useResumeStore((s) => s.updateCustomSection)
+  const updateCustomItem = useResumeStore((s) => s.updateCustomItem)
 
   const fontFamily = FONT_MAP[formatting.fontFamily] || "'Inter', system-ui, sans-serif"
   const baseFontSize = formatting.fontSize || 10.2
@@ -78,6 +84,13 @@ export default function ExecutiveTemplate({ resume, theme }) {
   const hasProjects = visibility.projects !== false && projects.length > 0
   const hasEducation = visibility.education !== false && education.length > 0
   const hasCertifications = visibility.certifications !== false && certifications.length > 0
+  const hasLanguages = visibility.languages !== false && languages.length > 0
+  const hasAwards = visibility.awards !== false && awards.length > 0
+  const hasReferences = visibility.references !== false && (
+    (references.mode === 'upon_request' && references.text?.trim()) ||
+    (references.mode === 'structured' && (references.items || []).length > 0)
+  )
+  const hasCustomSections = visibility.customSections !== false && customSections.length > 0
   const hasSkills = visibility.skills !== false && skillGroups.length > 0
   const hasHobbies = visibility.hobbies !== false && hobbies.length > 0
 
@@ -317,6 +330,157 @@ export default function ExecutiveTemplate({ resume, theme }) {
     </section>
   )
 
+  const renderLanguages = () => (
+    <section key="languages" className="resume-block">
+      <Head accent={accent} sectionKey="languages" sectionTitles={sectionTitles} onTitleChange={setSectionTitle} fontFamily={SERIF}>Languages</Head>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 text-[9.5pt]">
+        {languages.map((l) => (
+          <div key={l.id} className="flex items-center justify-between gap-2 border-b border-slate-200 pb-1.5">
+            <div>
+              <p className="font-bold text-[#0f172a]" style={{ fontFamily: SERIF }}>
+                <EditableText
+                  value={l.name}
+                  onChange={(val) => updateItem('languages', l.id, { name: val })}
+                  placeholder="Language"
+                />
+              </p>
+              {l.level && <p className="text-[8.5pt] italic text-slate-500">{l.level}</p>}
+            </div>
+            <div className="flex items-center gap-1 shrink-0">
+              {[1, 2, 3, 4, 5].map((dot) => (
+                <span
+                  key={dot}
+                  className="h-1.5 w-1.5 rounded-full"
+                  style={{
+                    backgroundColor: (l.rating || 4) >= dot ? accent : '#e2e8f0',
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+
+  const renderAwards = () => (
+    <section key="awards" className="resume-block">
+      <Head accent={accent} sectionKey="awards" sectionTitles={sectionTitles} onTitleChange={setSectionTitle} fontFamily={SERIF}>Awards & Honors</Head>
+      <div className="space-y-3">
+        {awards.map((a) => (
+          <div key={a.id} className="resume-block">
+            <div className="flex items-baseline justify-between gap-2">
+              <span className="font-bold text-[10pt] text-[#0f172a]" style={{ fontFamily: SERIF }}>
+                <EditableText
+                  value={a.title}
+                  onChange={(val) => updateItem('awards', a.id, { title: val })}
+                  placeholder="Award Title"
+                />
+              </span>
+              {a.date && (
+                <span className="text-[9pt] font-medium text-slate-500">
+                  <EditableText
+                    value={a.date}
+                    onChange={(val) => updateItem('awards', a.id, { date: val })}
+                    placeholder="Year"
+                  />
+                </span>
+              )}
+            </div>
+            {a.issuer && (
+              <p className="text-[9pt] font-semibold" style={{ color: accent }}>
+                <EditableText
+                  value={a.issuer}
+                  onChange={(val) => updateItem('awards', a.id, { issuer: val })}
+                  placeholder="Issuer"
+                />
+              </p>
+            )}
+            {a.description && (
+              <p className="mt-1 text-[9pt] text-slate-600 leading-relaxed whitespace-pre-line">{a.description}</p>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  )
+
+  const renderReferences = () => (
+    <section key="references" className="resume-block">
+      <Head accent={accent} sectionKey="references" sectionTitles={sectionTitles} onTitleChange={setSectionTitle} fontFamily={SERIF}>References</Head>
+      {references.mode === 'upon_request' ? (
+        <p className="italic text-center text-[9.5pt] text-slate-600 py-1" style={{ fontFamily: SERIF }}>
+          {references.text || 'References available upon request'}
+        </p>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-[9pt]">
+          {(references.items || []).map((r) => (
+            <div key={r.id} className="border border-slate-200/80 p-2.5 rounded space-y-0.5">
+              <p className="font-bold text-[#0f172a]" style={{ fontFamily: SERIF }}>{r.name}</p>
+              <p className="text-slate-600">{r.role}{r.company ? ` · ${r.company}` : ''}</p>
+              {r.email && <p className="text-slate-500">{r.email}</p>}
+              {r.phone && <p className="text-slate-500">{r.phone}</p>}
+            </div>
+          ))}
+        </div>
+      )}
+    </section>
+  )
+
+  const renderCustomSections = () => (
+    <div key="customSections" className="space-y-4">
+      {customSections.map((cs) => (
+        <section key={cs.id} className="resume-block">
+          <Head
+            accent={accent}
+            sectionKey={`custom_${cs.id}`}
+            sectionTitles={{ [`custom_${cs.id}`]: cs.title }}
+            onTitleChange={(_, v) => updateCustomSection(cs.id, { title: v })}
+            fontFamily={SERIF}
+          >
+            {cs.title}
+          </Head>
+          <div className="space-y-3">
+            {(cs.items || []).map((item) => (
+              <div key={item.id} className="resume-block">
+                <div className="flex items-baseline justify-between gap-2">
+                  <span className="font-bold text-[10pt] text-[#0f172a]" style={{ fontFamily: SERIF }}>
+                    <EditableText
+                      value={item.title}
+                      onChange={(val) => updateCustomItem(cs.id, item.id, { title: val })}
+                      placeholder="Title"
+                    />
+                  </span>
+                  {item.date && (
+                    <span className="text-[9pt] font-medium text-slate-500">
+                      <EditableText
+                        value={item.date}
+                        onChange={(val) => updateCustomItem(cs.id, item.id, { date: val })}
+                        placeholder="Date"
+                      />
+                    </span>
+                  )}
+                </div>
+                {item.subtitle && (
+                  <p className="text-[9pt] font-semibold" style={{ color: accent }}>
+                    <EditableText
+                      value={item.subtitle}
+                      onChange={(val) => updateCustomItem(cs.id, item.id, { subtitle: val })}
+                      placeholder="Subtitle"
+                    />
+                  </p>
+                )}
+                {item.description && (
+                  <p className="mt-1 text-[9pt] text-slate-600 leading-relaxed whitespace-pre-line">{item.description}</p>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  )
+
   const SECTION_MAP = {
     summary: { hasContent: hasSummary || basic.summary === '', render: renderSummary },
     experience: { hasContent: hasExperience, render: renderExperience },
@@ -324,7 +488,11 @@ export default function ExecutiveTemplate({ resume, theme }) {
     education: { hasContent: hasEducation, render: renderEducation },
     certifications: { hasContent: hasCertifications, render: renderCertifications },
     skills: { hasContent: hasSkills, render: renderSkills },
+    languages: { hasContent: hasLanguages, render: renderLanguages },
+    awards: { hasContent: hasAwards, render: renderAwards },
     hobbies: { hasContent: hasHobbies, render: renderHobbies },
+    references: { hasContent: hasReferences, render: renderReferences },
+    customSections: { hasContent: hasCustomSections, render: renderCustomSections },
   }
 
   const sectionsToRender = sectionOrder
