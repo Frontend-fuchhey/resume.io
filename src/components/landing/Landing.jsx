@@ -119,7 +119,7 @@ export function Landing({ onStart, onContinue, onSample }) {
         <motion.h1
           {...fadeUp}
           transition={{ delay: 0.05 }}
-          className="mt-6 max-w-2xl text-4xl font-extrabold leading-[1.12] tracking-tight text-[#1A1A1A] sm:text-6xl"
+          className="mt-6 max-w-2xl text-4xl font-extrabold leading-[1.12] tracking-tight text-[#1A1A1A] sm:text-6xl select-none"
         >
           Craft your resume with{" "}
           <span className="font-display italic text-[#FF5E1A] font-normal">
@@ -131,7 +131,7 @@ export function Landing({ onStart, onContinue, onSample }) {
         <motion.p
           {...fadeUp}
           transition={{ delay: 0.1 }}
-          className="mt-5 max-w-xl text-base leading-relaxed text-[#666055] sm:text-lg"
+          className="mt-5 max-w-xl text-base leading-relaxed text-[#666055] sm:text-lg select-none"
         >
           A high-end 3-pane live canvas editor designed with Impeccable spatial
           rhythm. Zero dummy clutter, instantaneous formatting controls, and
@@ -188,7 +188,7 @@ export function Landing({ onStart, onContinue, onSample }) {
           ].map((s) => (
             <div
               key={s.v}
-              className="flex flex-col items-center gap-1 rounded-xl border border-[#E8E4DC] bg-white px-3 py-4 shadow-card"
+              className="flex flex-col items-center gap-1 rounded-xl border border-[#E8E4DC] bg-white px-3 py-4 shadow-card select-none"
             >
               <s.icon size={16} className="text-[#FF5E1A]" />
               <span className="text-xl font-bold text-[#1A1A1A]">{s.k}</span>
@@ -214,8 +214,8 @@ export function Landing({ onStart, onContinue, onSample }) {
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-[#FFF3EB] text-[#FF5E1A]">
               <f.icon size={18} />
             </span>
-            <h3 className="mt-4 text-sm font-bold text-[#1A1A1A]">{f.title}</h3>
-            <p className="mt-1.5 text-xs leading-relaxed text-[#666055]">
+            <h3 className="mt-4 text-sm font-bold text-[#1A1A1A] select-none">{f.title}</h3>
+            <p className="mt-1.5 text-xs leading-relaxed text-[#666055] select-none">
               {f.body}
             </p>
           </motion.div>
@@ -226,14 +226,14 @@ export function Landing({ onStart, onContinue, onSample }) {
       <section className="mt-16">
         <div className="mb-5 flex items-end justify-between">
           <div>
-            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#FF5E1A]">
+            <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-[#FF5E1A] select-none">
               Layout Selection
             </p>
-            <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-[#1A1A1A]">
+            <h2 className="mt-1 text-2xl font-extrabold tracking-tight text-[#1A1A1A] select-none">
               Professional ATS Templates
             </h2>
           </div>
-          <span className="hidden items-center gap-1.5 text-xs font-medium text-[#666055] sm:inline-flex">
+          <span className="hidden items-center gap-1.5 text-xs font-medium text-[#666055] sm:inline-flex select-none">
             <Layers size={13} /> lossless data switching
           </span>
         </div>
@@ -247,14 +247,14 @@ export function Landing({ onStart, onContinue, onSample }) {
             >
               <MiniPreview id={t.id} accentClass={t.grad} />
               <div className="mt-3">
-                <p className="flex items-center gap-2 text-xs font-bold text-[#1A1A1A]">
+                <p className="flex items-center gap-2 text-xs font-bold text-[#1A1A1A] select-none">
                   <span
                     className="h-2.5 w-2.5 rounded-full"
                     style={{ backgroundColor: t.accent }}
                   />
                   {t.name}
                 </p>
-                <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-[#666055]">
+                <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-[#666055] select-none">
                   {t.description}
                 </p>
               </div>
@@ -265,10 +265,10 @@ export function Landing({ onStart, onContinue, onSample }) {
 
       {/* Bottom CTA */}
       <section className="mt-16 flex flex-col items-center gap-4 rounded-2xl border border-[#E8E4DC] bg-white p-8 text-center shadow-card sm:p-12">
-        <h2 className="max-w-md text-2xl font-extrabold text-[#1A1A1A] sm:text-3xl">
-          Build a resume that passes the human & robot test.
+        <h2 className="max-w-md text-2xl font-extrabold text-[#1A1A1A] sm:text-3xl select-none">
+          Build a resume that passes the human &amp; robot test.
         </h2>
-        <p className="max-w-md text-xs leading-relaxed text-[#666055]">
+        <p className="max-w-md text-xs leading-relaxed text-[#666055] select-none">
           Your data is stored locally in your browser. Vector PDF downloads
           follow the strict [User_Name]-resume.pdf naming standard.
         </p>
@@ -292,7 +292,7 @@ export function Landing({ onStart, onContinue, onSample }) {
         </div>
       </section>
 
-      <footer className="mt-12 text-center text-xs text-[#666055]">
+      <footer className="mt-12 text-center text-xs text-[#666055] select-none">
         <p>
           resume.io — High-End ATS Resume Studio. Powered by Impeccable Design
           Principles.
